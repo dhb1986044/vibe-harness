@@ -1,0 +1,271 @@
+{
+  "schema_version": "v5.6",
+  "updated_at": "2026-05-22",
+  "lessons": [
+    {
+      "id": "L1",
+      "title": "不发明命令",
+      "type": "guideline",
+      "maturity": "proven",
+      "tags": [
+        "Process",
+        "Command"
+      ],
+      "priority": "P1",
+      "status": "Pinned",
+      "severity": "high",
+      "frequency": 3,
+      "reuse_potential": "high",
+      "automation_potential": "medium",
+      "promotion_target": "guard",
+      "promotion_status": "promoted",
+      "source": "docs/LESSONS.md",
+      "last_referenced": "2026-05-22",
+      "reference_count": 18,
+      "referenced_in": [
+        "memory-bank/progress.md",
+        "memory-bank/activeContext.md",
+        "docs/AI_CHANGELOG.md",
+        "evolution/promotion-log.md"
+      ]
+    },
+    {
+      "id": "L2",
+      "title": "Memory check 失败不得完成",
+      "type": "process",
+      "maturity": "proven",
+      "tags": [
+        "Memory",
+        "Guard"
+      ],
+      "priority": "P1",
+      "status": "active",
+      "severity": "high",
+      "frequency": 2,
+      "reuse_potential": "high",
+      "automation_potential": "high",
+      "promotion_target": "skill",
+      "promotion_status": "promoted:vibe-memory-check",
+      "source": "docs/LESSONS.md",
+      "last_referenced": "2026-05-22",
+      "reference_count": 15,
+      "referenced_in": [
+        "memory-bank/progress.md",
+        "memory-bank/activeContext.md",
+        "docs/AI_CHANGELOG.md",
+        "evolution/promotion-log.md"
+      ]
+    },
+    {
+      "id": "L3",
+      "title": "AGENTS.md 是 Map 不是 Manual",
+      "type": "decision",
+      "maturity": "proven",
+      "tags": [
+        "AGENTS",
+        "Architecture"
+      ],
+      "priority": "P2",
+      "status": "active",
+      "severity": "medium",
+      "frequency": 1,
+      "reuse_potential": "high",
+      "automation_potential": "high",
+      "promotion_target": "template+linter",
+      "promotion_status": "promoted:v5.1-AGENTS-Map+sync_vibe_skills+L2-reference-check",
+      "source": "docs/LESSONS.md",
+      "last_referenced": "2026-05-19",
+      "reference_count": 9,
+      "referenced_in": [
+        "memory-bank/progress.md",
+        "docs/AI_CHANGELOG.md",
+        "evolution/promotion-log.md"
+      ]
+    },
+    {
+      "id": "L4",
+      "title": "harness 模板不应打包业务专属 skill",
+      "type": "guideline",
+      "maturity": "verified",
+      "tags": [
+        "Skills",
+        "Architecture"
+      ],
+      "priority": "P2",
+      "status": "active",
+      "severity": "medium",
+      "frequency": 1,
+      "reuse_potential": "high",
+      "automation_potential": "medium",
+      "promotion_target": "checklist",
+      "promotion_status": "candidate",
+      "source": "docs/LESSONS.md",
+      "last_referenced": "2026-05-07",
+      "reference_count": 4,
+      "referenced_in": [
+        "docs/AI_CHANGELOG.md",
+        "evolution/promotion-log.md"
+      ]
+    },
+    {
+      "id": "L5",
+      "title": "Skill 三层一致性（description / SKILL.md 正文 / docs/）",
+      "type": "pitfall",
+      "maturity": "proven",
+      "tags": [
+        "Skills",
+        "Lint"
+      ],
+      "priority": "P1",
+      "status": "active",
+      "severity": "high",
+      "frequency": 2,
+      "reuse_potential": "high",
+      "automation_potential": "high",
+      "promotion_target": "linter",
+      "promotion_status": "promoted:ghost-file-linter",
+      "source": "docs/LESSONS.md",
+      "last_referenced": "2026-05-12",
+      "reference_count": 4,
+      "referenced_in": [
+        "docs/AI_CHANGELOG.md",
+        "evolution/promotion-log.md"
+      ]
+    },
+    {
+      "id": "L6",
+      "title": "Lesson 需带 type+maturity 字段",
+      "type": "decision",
+      "maturity": "verified",
+      "tags": [
+        "Lessons",
+        "Schema"
+      ],
+      "priority": "P2",
+      "status": "active",
+      "severity": "medium",
+      "frequency": 1,
+      "reuse_potential": "high",
+      "automation_potential": "high",
+      "promotion_target": "linter",
+      "promotion_status": "promoted:lesson-schema-lint",
+      "source": "docs/LESSONS.md",
+      "last_referenced": "2026-05-19",
+      "reference_count": 15,
+      "referenced_in": [
+        "memory-bank/progress.md",
+        "docs/AI_CHANGELOG.md",
+        "evolution/promotion-log.md"
+      ]
+    },
+    {
+      "id": "L7",
+      "title": "Lesson 引用追踪闭环（v5.3）",
+      "type": "process",
+      "maturity": "verified",
+      "tags": [
+        "Lessons",
+        "Tracking"
+      ],
+      "priority": "P2",
+      "status": "active",
+      "severity": "medium",
+      "frequency": 1,
+      "reuse_potential": "high",
+      "automation_potential": "high",
+      "promotion_target": "linter",
+      "promotion_status": "promoted:lesson-refs-scanner",
+      "source": "docs/LESSONS.md",
+      "last_referenced": "2026-05-22",
+      "reference_count": 17,
+      "referenced_in": [
+        "memory-bank/progress.md",
+        "memory-bank/activeContext.md",
+        "docs/AI_CHANGELOG.md",
+        "evolution/promotion-log.md"
+      ]
+    },
+    {
+      "id": "L8",
+      "title": "时间序日志标题前缀与孤儿页面守护（v5.4）",
+      "type": "decision",
+      "maturity": "verified",
+      "tags": [
+        "Lint",
+        "Logs",
+        "Docs"
+      ],
+      "priority": "P2",
+      "status": "active",
+      "severity": "medium",
+      "frequency": 1,
+      "reuse_potential": "high",
+      "automation_potential": "high",
+      "promotion_target": "linter",
+      "promotion_status": "promoted:log-prefix-and-orphan-docs-lint",
+      "source": "docs/LESSONS.md",
+      "last_referenced": "2026-05-22",
+      "reference_count": 15,
+      "referenced_in": [
+        "memory-bank/progress.md",
+        "memory-bank/activeContext.md",
+        "docs/AI_CHANGELOG.md",
+        "evolution/promotion-log.md"
+      ]
+    },
+    {
+      "id": "L9",
+      "title": "Copilot 集成与三向同步（v5.5）",
+      "type": "decision",
+      "maturity": "verified",
+      "tags": [
+        "Agents",
+        "Integration",
+        "Copilot"
+      ],
+      "priority": "P2",
+      "status": "active",
+      "severity": "medium",
+      "frequency": 1,
+      "reuse_potential": "high",
+      "automation_potential": "high",
+      "promotion_target": "template+linter",
+      "promotion_status": "promoted:three-way-sync+governance-instructions",
+      "source": "docs/LESSONS.md",
+      "last_referenced": "2026-05-19",
+      "reference_count": 7,
+      "referenced_in": [
+        "memory-bank/progress.md",
+        "docs/AI_CHANGELOG.md",
+        "evolution/promotion-log.md"
+      ]
+    },
+    {
+      "id": "L10",
+      "title": "项目模式与 phase 切档（v5.6）",
+      "type": "decision",
+      "maturity": "verified",
+      "tags": [
+        "Onboarding",
+        "Phases",
+        "Hooks"
+      ],
+      "priority": "P2",
+      "status": "active",
+      "severity": "medium",
+      "frequency": 1,
+      "reuse_potential": "high",
+      "automation_potential": "high",
+      "promotion_target": "template+linter",
+      "promotion_status": "promoted:project-mode+phase-aware-hooks",
+      "source": "docs/LESSONS.md",
+      "last_referenced": "2026-05-22",
+      "reference_count": 8,
+      "referenced_in": [
+        "memory-bank/progress.md",
+        "memory-bank/activeContext.md",
+        "docs/AI_CHANGELOG.md"
+      ]
+    }
+  ]
+}

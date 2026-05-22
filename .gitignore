@@ -1,0 +1,15 @@
+# Python/runtime caches
+__pycache__/
+*.py[cod]
+
+# Local tool state
+.serena/
+
+# Environment and private local config
+.env
+.env.*
+*.local
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

@@ -1,0 +1,164 @@
+version: v5.6
+updated_at: 2026-05-19
+profile: vibe-harness
+
+purpose: >
+  Central registry for project memory. AGENTS.md defines behavior;
+  this file tells agents where project facts, lessons, skills, and checks live.
+
+# v5.6: 三类项目模式 + 四阶段 harness phase（来自 v5.1 增量整合）。
+# 本仓库自身是 vibe-harness 模板源仓，已稳定 managed 全量门禁。
+project_mode: vibe_managed_legacy   # new_project | vibe_managed_legacy | unmanaged_legacy
+harness_phase: managed_harness      # discovery_only | shadow_harness | soft_gate | managed_harness
+
+# v5.6: phase → hook 决策矩阵。
+# 注释中说明各阶段允许的检查级别；脚本读取本段决定 block/allow。
+hook_policy:
+  discovery_only: warn_only            # 只读侦察期：永不 block
+  shadow_harness: warn_only            # 影子运行：仅输出警告
+  soft_gate: block_governance_files    # 软门禁：仅治理面失败时 block
+  managed_harness: block_all_failures  # 硬门禁：任何 memory check 失败均 block
+
+# v5.6: 治理面路径白名单，soft_gate 阶段以此判定是否 block。
+# 与 .github/instructions/governance.instructions.md 的 applyTo 保持语义一致。
+governance_paths:
+  - AGENTS.md
+  - docs/agents/
+  - memory-bank/
+  - docs/LESSONS.md
+  - docs/LESSONS_ARCHIVE.md
+  - docs/LESSONS_RULES.md
+  - docs/AI_CHANGELOG.md
+  - evolution/
+  - .claude/skills/vibe-
+  - .codex/skills/vibe-
+  - .github/skills/vibe-
+  - .github/instructions/
+  - .github/copilot-instructions.md
+  - scripts/hooks/
+  - scripts/sync_vibe_skills.py
+  - scripts/check_memory_consistency.py
+  - scripts/evolve_lessons.py
+
+core_files:
+  agent_contract: AGENTS.md
+  active_context: memory-bank/activeContext.md
+  progress: memory-bank/progress.md
+  architecture: memory-bank/architecture.md
+  tech_stack: memory-bank/tech-stack.md
+  prd: memory-bank/prd.md
+  lessons: docs/LESSONS.md
+  lessons_archive: docs/LESSONS_ARCHIVE.md
+  lessons_rules: docs/LESSONS_RULES.md
+  changelog: docs/AI_CHANGELOG.md
+  lesson_index: evolution/lesson-index.json
+  promotion_log: evolution/promotion-log.md
+
+read_policy:
+  bootstrap_order:
+    - AGENTS.md
+    - memory-bank/memory-registry.yaml
+    - memory-bank/activeContext.md
+    - memory-bank/progress.md
+    - memory-bank/architecture.md
+    - memory-bank/tech-stack.md
+    - docs/LESSONS.md
+    - evolution/lesson-index.json
+  lessons_default:
+    pinned: true
+    recent_active_count: 10
+    archive: false
+  archive_expand_when:
+    - tag_match
+    - keyword_match
+    - module_match
+    - repeated_failure_pattern
+
+lessons_policy:
+  active_soft_limit: 12
+  active_target_min: 8
+  active_target_max: 10
+  pinned_exempt_from_archive: true
+  prefer_archive_when_promoted: true
+  # v5.2: structured lesson schema
+  lesson_schema:
+    required_fields: [type, maturity]
+    types: [model, decision, guideline, pitfall, process]
+    maturities: [draft, verified, proven]
+    draft_soft_limit_in_active_window: 5
+    # v5.3: reference-tracking fields written by `--update-refs`
+    tracking_fields: [last_referenced, reference_count, referenced_in]
+    scan_targets:
+      - memory-bank/progress.md
+      - memory-bank/activeContext.md
+      - memory-bank/architecture.md
+      - docs/AI_CHANGELOG.md
+      - evolution/promotion-log.md
+      - plans/*.md
+      - plans/**/*.md
+    unused_thresholds_months:
+      verified: 6
+      proven: 12
+  # v5.4: log-heading prefix lint + orphan-docs lint (Karpathy LLM-Wiki inspired)
+  log_prefix:
+    files:
+      - docs/AI_CHANGELOG.md
+      - evolution/promotion-log.md
+      - memory-bank/progress.md
+    pattern: "## [YYYY-MM-DD] <kind> | <summary>"
+    kinds: [changelog, promote, lint, progress, evolve, ingest, decision]
+  orphan_docs:
+    catalog_pairs:
+      - catalog: AGENTS.md
+        content_glob: docs/agents/*.md
+      - catalog: memory-bank/memory-registry.yaml
+        content_glob: memory-bank/*.md
+
+promotion_policy:
+  lesson_to_xcheck_frequency: 2
+  lesson_to_guard_frequency: 2
+  lesson_to_skill_frequency: 3
+  high_severity_promote_immediately: true
+  anti_skill_bloat: true
+
+skill_roots:
+  codex: .codex/skills
+  claude: .claude/skills
+  copilot: .github/skills
+
+required_vibe_skills:
+  - vibe-memory-check
+  - vibe-evolve
+  - vibe-guard
+  - vibe-xcheck
+
+hooks:
+  codex_user: ~/.codex/hooks.json
+  codex_project: .codex/hooks.json
+  claude_project: .claude/settings.json
+  copilot: null  # Copilot 无 shell hook；走 .github/copilot-instructions.md + .github/instructions/governance.instructions.md (applyTo) + AGENTS.md 自律
+
+agent_targets:
+  codex:
+    skill_root: .codex/skills
+    hooks_supported: true
+    contract_file: AGENTS.md
+  claude:
+    skill_root: .claude/skills
+    hooks_supported: true
+    contract_file: AGENTS.md
+  copilot:
+    skill_root: .github/skills
+    hooks_supported: false
+    contract_file: AGENTS.md
+    instructions_dir: .github/instructions
+    repo_instructions: .github/copilot-instructions.md
+    memory_policy:
+      repo_scope_forbidden: true  # /memories/repo/ 禁止用于仓库事实
+      session_allowed: true
+      user_allowed: true
+
+checks:
+  memory_consistency: python scripts/check_memory_consistency.py --strict
+  evolve_lessons: python scripts/evolve_lessons.py --write
+  update_lesson_refs: python scripts/check_memory_consistency.py --update-refs

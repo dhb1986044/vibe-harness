@@ -1,0 +1,1 @@
+{"evals":[{"name":"memory-check-present","command":"python scripts/check_memory_consistency.py --strict"}]}

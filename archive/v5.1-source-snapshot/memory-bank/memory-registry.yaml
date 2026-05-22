@@ -1,0 +1,63 @@
+version: v5.1
+project_name: TBD
+project_mode: unmanaged_legacy  # new_project | vibe_managed_legacy | unmanaged_legacy
+harness_phase: discovery_only   # discovery_only | shadow_harness | soft_gate | managed_harness
+updated_at: TBD
+
+core_files:
+  agent_contract: AGENTS.md
+  active_context: memory-bank/activeContext.md
+  progress: memory-bank/progress.md
+  architecture: memory-bank/architecture.md
+  tech_stack: memory-bank/tech-stack.md
+  prd: memory-bank/prd.md
+  lessons: docs/LESSONS.md
+  lessons_archive: docs/LESSONS_ARCHIVE.md
+  lessons_rules: docs/LESSONS_RULES.md
+  changelog: docs/AI_CHANGELOG.md
+  lesson_index: evolution/lesson-index.json
+  promotion_log: evolution/promotion-log.md
+
+read_policy:
+  default_lessons:
+    pinned: true
+    recent_active_count: 10
+    archive: false
+  expand_archive_when:
+    - tag_match
+    - keyword_match
+    - module_match
+    - repeated_failure_pattern
+
+promotion_policy:
+  lesson_to_xcheck_frequency: 2
+  lesson_to_guard_frequency: 2
+  lesson_to_skill_frequency: 3
+  high_severity_promote_immediately: true
+  anti_skill_bloat: true
+
+hook_policy:
+  discovery_only: warn_only
+  shadow_harness: warn_only
+  soft_gate: block_governance_files
+  managed_harness: block_all_memory_failures
+
+verified_commands: {}
+unverified_commands: []
+unknowns:
+  - 项目尚未完成 harness 接管
+
+skills:
+  core:
+    - vibe-bootstrap
+    - vibe-discovery
+    - vibe-retrofit
+    - vibe-exec
+    - vibe-memory-check
+    - vibe-evolve
+    - vibe-guard
+    - vibe-xcheck
+  legacy_adapters:
+    - vibe-init
+    - vibe-alpha
+    - vibe-omega

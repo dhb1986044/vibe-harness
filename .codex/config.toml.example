@@ -1,0 +1,6 @@
+[features]
+codex_hooks = true
+
+# Optional: recognize alternate project instruction files.
+# project_doc_fallback_filenames = ["TEAM_GUIDE.md", ".agents.md"]
+# project_doc_max_bytes = 65536

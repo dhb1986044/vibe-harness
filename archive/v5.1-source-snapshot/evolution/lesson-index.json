@@ -1,0 +1,70 @@
+{
+  "version": "v5.1",
+  "updated_at": "2026-05-07",
+  "lessons": [
+    {
+      "id": "L1",
+      "title": "不得凭空发明命令",
+      "tags": [
+        "Process",
+        "Command"
+      ],
+      "priority": "P1",
+      "status": "Pinned",
+      "promotion_score": 16,
+      "promotion_target": "guard",
+      "promotion_status": "candidate"
+    },
+    {
+      "id": "L2",
+      "title": "未管理历史项目必须先 Discovery",
+      "tags": [
+        "Legacy",
+        "Discovery"
+      ],
+      "priority": "P1",
+      "status": "Pinned",
+      "promotion_score": 21,
+      "promotion_target": "skill",
+      "promotion_status": "candidate"
+    },
+    {
+      "id": "L3",
+      "title": "Memory 检查失败不得 COMPLETE",
+      "tags": [
+        "Memory",
+        "Gate"
+      ],
+      "priority": "P1",
+      "status": "Pinned",
+      "promotion_score": 21,
+      "promotion_target": "guard",
+      "promotion_status": "candidate"
+    },
+    {
+      "id": "L4",
+      "title": "高频经验应晋升为 Guard/XCheck/Skill",
+      "tags": [
+        "Evolve"
+      ],
+      "priority": "P1",
+      "status": "活跃",
+      "promotion_score": 8,
+      "promotion_target": "xcheck",
+      "promotion_status": "watch"
+    },
+    {
+      "id": "L5",
+      "title": "老项目接管先 warn 后 block",
+      "tags": [
+        "Legacy",
+        "Hook"
+      ],
+      "priority": "P1",
+      "status": "活跃",
+      "promotion_score": 13,
+      "promotion_target": "guard",
+      "promotion_status": "candidate"
+    }
+  ]
+}
