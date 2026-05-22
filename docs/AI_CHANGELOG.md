@@ -10,7 +10,7 @@
 - 原因：当前目录不是 Git 工作树，用户要求提交并推送到 GitHub；按 `vibe-git` 契约，提交前需要明确计划、同步 memory 并确保提交范围可解释。
 - 风险等级：中。首次推送会把当前目录发布到远端仓库；本次只做发布准备，不改业务逻辑或治理脚本行为。
 - 复杂度影响评分：1/10。
-- 验证方式：`python scripts/check_memory_consistency.py --strict`；敏感词扫描；`git status --short`；首次 push 结果。
+- 验证方式：`python scripts/check_memory_consistency.py --strict`；敏感词扫描；Python 语法检查；`git diff --cached --check`；`git push -u origin main` 成功；`git ls-remote --heads origin main` 返回远端 `main` 指向 `5a8bc5c1386367fa266b8ced6d51baa73943d564`。
 - 回滚方式：提交前删除本地 `.git/` 或移除新增治理文件；提交后但推送前可用 `git reset --soft HEAD~1`；推送后优先追加修正提交，不做强制覆盖。
 - 关联 lessons：L1 L2 L7 L8 L10。
 

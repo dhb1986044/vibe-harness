@@ -5,10 +5,10 @@
 ## 初始化骨架（按时间倒序，最新的在最上面）
 
 ## [2026-05-22] progress | 首次 Git 发布到 GitHub
-- 已完成：确认当前目录不是 Git 工作树，远端 `https://github.com/dhb1986044/vibe-harness.git` 未返回可见分支；按首次发布处理。新增根 `.gitignore` 排除 Python 缓存、`.serena/` 本地工具状态、环境文件和 OS/editor 噪声；新增 `.gitattributes` 统一文本文件 LF；生成 `plans/commit-plan.md` 记录提交范围、检查项和回滚策略。已执行 lesson 引用回填、`python scripts/check_memory_consistency.py --strict`、基础敏感词扫描、Python 语法检查、`git diff --cached --check`，并创建首次本地提交 `chore: publish vibe harness v5.6`。关联 lessons：L1 L2 L7 L8 L10。
+- 已完成：确认当前目录不是 Git 工作树，远端 `https://github.com/dhb1986044/vibe-harness.git` 未返回可见分支；按首次发布处理。新增根 `.gitignore` 排除 Python 缓存、`.serena/` 本地工具状态、环境文件和 OS/editor 噪声；新增 `.gitattributes` 统一文本文件 LF；生成 `plans/commit-plan.md` 记录提交范围、检查项和回滚策略。已执行 lesson 引用回填、`python scripts/check_memory_consistency.py --strict`、基础敏感词扫描、Python 语法检查、`git diff --cached --check`，并创建首次内容提交 `5a8bc5c chore: publish vibe harness v5.6`。`git push -u origin main` 已成功创建远端 `main` 分支，`git ls-remote --heads origin main` 返回 `5a8bc5c1386367fa266b8ced6d51baa73943d564`。关联 lessons：L1 L2 L7 L8 L10。
 - 进行中：无。
-- 阻塞 / 风险：无当前阻塞。残余风险是远端仓库权限或默认分支策略可能拒绝首次 push；若远端存在未发现历史，不进行强制覆盖。
-- 下一步：执行 `git push -u origin main`；推送结果以 GitHub 远端响应和最终 `git status` 为准。
+- 阻塞 / 风险：无当前阻塞。残余风险是 GitHub 仓库默认分支保护或页面索引延迟不会影响已完成的 `main` 分支推送；不进行强制覆盖。
+- 下一步：无。
 
 ## [2026-05-19] progress | evolve schema merge + PreTool guard 加固
 - 已完成：按研究报告与计划做小步治理脚本稳固——`scripts/evolve_lessons.py` 支持 7 列 LESSONS 索引并把 `--write` 改为 schema-safe merge，保留 v5.6 `lesson-index.json` 里的 `type` / `maturity` / 引用追踪 / 历史 promotion 字段；`scripts/hooks/codex_pre_tool_guard.py` 扩展跨平台危险命令拦截，覆盖 git 强制破坏、Linux 根目录递归删除、PowerShell 递归强制删除、Windows 递归静默删除。同步 `docs/AI_CHANGELOG.md` 与 `activeContext.md`，并用 `--update-refs` 回填 lesson 引用。关联 lessons：L1 L2 L6 L7 L8 L10。

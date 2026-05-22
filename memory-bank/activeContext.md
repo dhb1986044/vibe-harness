@@ -20,4 +20,4 @@
 - [x] 确认用户允许执行 `git commit` 与 `git push`。
 - [x] 生成提交计划与忽略规则。
 - [x] 执行 memory consistency、基础敏感词扫描、Python 语法检查与 Git whitespace 检查。
-- [x] 初始化 Git、创建首次提交并准备推送到 GitHub。
+- [x] 初始化 Git、创建首次提交并推送到 GitHub。
