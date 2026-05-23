@@ -1,26 +1,18 @@
-version: v5.6
-updated_at: 2026-05-19
+version: v5.7
+updated_at: 2026-05-23
 profile: vibe-harness
 
-purpose: >
-  Central registry for project memory. AGENTS.md defines behavior;
-  this file tells agents where project facts, lessons, skills, and checks live.
+purpose: "Memory map: facts, lessons, skills, checks."
 
-# v5.6: 三类项目模式 + 四阶段 harness phase（来自 v5.1 增量整合）。
-# 本仓库自身是 vibe-harness 模板源仓，已稳定 managed 全量门禁。
 project_mode: vibe_managed_legacy   # new_project | vibe_managed_legacy | unmanaged_legacy
 harness_phase: managed_harness      # discovery_only | shadow_harness | soft_gate | managed_harness
 
-# v5.6: phase → hook 决策矩阵。
-# 注释中说明各阶段允许的检查级别；脚本读取本段决定 block/allow。
 hook_policy:
-  discovery_only: warn_only            # 只读侦察期：永不 block
-  shadow_harness: warn_only            # 影子运行：仅输出警告
-  soft_gate: block_governance_files    # 软门禁：仅治理面失败时 block
-  managed_harness: block_all_failures  # 硬门禁：任何 memory check 失败均 block
+  discovery_only: warn_only
+  shadow_harness: warn_only
+  soft_gate: block_governance_files
+  managed_harness: block_all_failures
 
-# v5.6: 治理面路径白名单，soft_gate 阶段以此判定是否 block。
-# 与 .github/instructions/governance.instructions.md 的 applyTo 保持语义一致。
 governance_paths:
   - AGENTS.md
   - docs/agents/
@@ -38,6 +30,7 @@ governance_paths:
   - scripts/hooks/
   - scripts/sync_vibe_skills.py
   - scripts/check_memory_consistency.py
+  - scripts/context_budget.py
   - scripts/evolve_lessons.py
 
 core_files:
@@ -55,6 +48,49 @@ core_files:
   promotion_log: evolution/promotion-log.md
 
 read_policy:
+  default_profile: light
+  profiles:
+    light:
+      budget_bytes: 12000
+      files:
+        - AGENTS.md
+        - memory-bank/memory-registry.yaml
+        - memory-bank/activeContext.md
+      optional_files:
+        - memory-bank/tech-stack.md
+    standard:
+      budget_bytes: 24000
+      files:
+        - AGENTS.md
+        - memory-bank/memory-registry.yaml
+        - memory-bank/activeContext.md
+        - memory-bank/architecture.md
+        - memory-bank/tech-stack.md
+      slices:
+        - memory-bank/progress.md#latest_entry
+        - docs/LESSONS.md#active_summary_pinned_recent3
+    full:
+      budget_bytes: 70000
+      files:
+        - AGENTS.md
+        - memory-bank/memory-registry.yaml
+        - memory-bank/activeContext.md
+        - memory-bank/progress.md
+        - memory-bank/architecture.md
+        - memory-bank/tech-stack.md
+        - docs/LESSONS.md
+        - evolution/lesson-index.json
+  expand_triggers:
+    standard:
+      - code_or_config_change
+      - build_or_test_command_needed
+      - module_boundary_question
+    full:
+      - governance_path_change
+      - high_risk_change
+      - repeated_failure_or_rework
+      - lessons_or_evolution_change
+      - memory_schema_or_hook_change
   bootstrap_order:
     - AGENTS.md
     - memory-bank/memory-registry.yaml
@@ -80,13 +116,11 @@ lessons_policy:
   active_target_max: 10
   pinned_exempt_from_archive: true
   prefer_archive_when_promoted: true
-  # v5.2: structured lesson schema
   lesson_schema:
     required_fields: [type, maturity]
     types: [model, decision, guideline, pitfall, process]
     maturities: [draft, verified, proven]
     draft_soft_limit_in_active_window: 5
-    # v5.3: reference-tracking fields written by `--update-refs`
     tracking_fields: [last_referenced, reference_count, referenced_in]
     scan_targets:
       - memory-bank/progress.md
@@ -99,7 +133,6 @@ lessons_policy:
     unused_thresholds_months:
       verified: 6
       proven: 12
-  # v5.4: log-heading prefix lint + orphan-docs lint (Karpathy LLM-Wiki inspired)
   log_prefix:
     files:
       - docs/AI_CHANGELOG.md
@@ -136,7 +169,7 @@ hooks:
   codex_user: ~/.codex/hooks.json
   codex_project: .codex/hooks.json
   claude_project: .claude/settings.json
-  copilot: null  # Copilot 无 shell hook；走 .github/copilot-instructions.md + .github/instructions/governance.instructions.md (applyTo) + AGENTS.md 自律
+  copilot: null
 
 agent_targets:
   codex:
@@ -154,11 +187,12 @@ agent_targets:
     instructions_dir: .github/instructions
     repo_instructions: .github/copilot-instructions.md
     memory_policy:
-      repo_scope_forbidden: true  # /memories/repo/ 禁止用于仓库事实
+      repo_scope_forbidden: true
       session_allowed: true
       user_allowed: true
 
 checks:
   memory_consistency: python scripts/check_memory_consistency.py --strict
+  context_budget: python scripts/context_budget.py --profile light --json
   evolve_lessons: python scripts/evolve_lessons.py --write
   update_lesson_refs: python scripts/check_memory_consistency.py --update-refs

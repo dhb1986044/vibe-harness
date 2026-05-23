@@ -67,7 +67,7 @@ INIT → MEMORY_BOOTSTRAP → PLAN → ALPHA → REVIEW → EXEC → XCHECK → 
 - `python scripts/check_memory_consistency.py --print-phase`：打印当前 mode/phase JSON。
 - `python scripts/check_memory_consistency.py --warn-only`：强制 warn-only 模式（discovery / shadow 阶段使用）。
 - `python scripts/discover_project.py --write`：只读侦察脚本（PR-3 引入），生成 `*.draft.md`。
-- `python scripts/install_vibe_harness.py --target <path> --mode <bootstrap|retrofit|discovery>`：安装器（PR-3 引入）。
+- `python scripts/install_vibe_harness.py --target <path> --mode <bootstrap|retrofit|discovery> --context-profile light --skill-set lean`：安装器（PR-3 引入，v5.7 默认轻量）。安装器不得复制缓存/本地产物；在 discovery/retrofit 下也要补齐缺失的 Copilot governance instruction 与 Claude Stop hook 设置，但不得覆盖目标项目已有配置。需要复现 v5.6 重治理安装时传 `--context-profile full --skill-set full`。
 
 ## 5. 衡量指标
 

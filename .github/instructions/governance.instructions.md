@@ -1,5 +1,5 @@
 ---
-applyTo: "memory-bank/**,docs/LESSONS*.md,docs/AI_CHANGELOG.md,docs/agents/**,evolution/**,AGENTS.md,.claude/skills/vibe-*/**,.codex/skills/vibe-*/**,.github/skills/vibe-*/**,.github/instructions/**,.github/copilot-instructions.md,scripts/hooks/**,scripts/sync_vibe_skills.py,scripts/check_memory_consistency.py,scripts/evolve_lessons.py"
+applyTo: "memory-bank/**,docs/LESSONS*.md,docs/AI_CHANGELOG.md,docs/agents/**,evolution/**,AGENTS.md,.claude/skills/vibe-*/**,.codex/skills/vibe-*/**,.github/skills/vibe-*/**,.github/instructions/**,.github/copilot-instructions.md,scripts/hooks/**,scripts/sync_vibe_skills.py,scripts/check_memory_consistency.py,scripts/context_budget.py,scripts/evolve_lessons.py"
 description: "vibe-harness 治理面被动注入。改动触达治理路径时强制 MEMORY_CHECK / 三向同步 / lesson-index 引用更新。"
 ---
 

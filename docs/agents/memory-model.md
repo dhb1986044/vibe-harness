@@ -2,7 +2,7 @@
 
 > **Layer B 摘要**
 > - **何时该读**：MEMORY_BOOTSTRAP 阶段要决定读什么、需要区分 L1~L4 哪一层路径、设计新 skill / hook 时需参考触发矩阵、不确定某件事实应入 memory-bank 还是 LESSONS 。
-> - **包含内容**：L1 会话态 / L2 项目态 / L3 经验态 / L4 能力态四层 memory 的位置、所有者与生命周期；vibe-* 治理四件套与功能 skill 的触发矩阵；MEMORY_BOOTSTRAP 必读清单。
+> - **包含内容**：L1 会话态 / L2 项目态 / L3 经验态 / L4 能力态四层 memory 的位置、所有者与生命周期；vibe-* 治理四件套与功能 skill 的触发矩阵；read_policy profile。
 > - **不在此处**：LESSONS 写入 / 归档 / 引用追踪规则 → [lessons-policy.md](lessons-policy.md) + [../LESSONS_RULES.md](../LESSONS_RULES.md)；L4 晋升判定 → [evolution-policy.md](evolution-policy.md)；MEMORY_CHECK 如何阻断 COMPLETE → [safety-and-completion.md](safety-and-completion.md)。
 
 > 本文件展开 [AGENTS.md](../../AGENTS.md) §3 + §6。
@@ -18,25 +18,28 @@ L4 能力态 memory：已固化为 skills、guards、xchecks、templates 的能�
 
 L3 不应无限堆积。高频、严重、可复用、可验证的 lessons 必须通过 EVOLVE 晋升为 L4。详见 [evolution-policy.md](evolution-policy.md)。
 
-## MEMORY_BOOTSTRAP 必读顺序
+## MEMORY_BOOTSTRAP 读取 Profile
 
-任务开始前，代理必须按以下顺序读取：
+任务开始先读 [AGENTS.md](../../AGENTS.md) 与 [memory-bank/memory-registry.yaml](../../memory-bank/memory-registry.yaml)，再按 `read_policy.default_profile` 选择读取范围。默认是 `light`。
 
-1. [AGENTS.md](../../AGENTS.md)：当前执行契约。
-2. [memory-bank/memory-registry.yaml](../../memory-bank/memory-registry.yaml)：memory 索引地图。
-3. [memory-bank/activeContext.md](../../memory-bank/activeContext.md)：当前焦点。
-4. [memory-bank/progress.md](../../memory-bank/progress.md)：最近进展。
-5. [memory-bank/architecture.md](../../memory-bank/architecture.md)：架构边界。
-6. [memory-bank/tech-stack.md](../../memory-bank/tech-stack.md)：语言、依赖、真实命令来源。
-7. [docs/LESSONS.md](../LESSONS.md)：Active Summary、Pinned、最近 5~10 条活跃 lessons。
-8. [evolution/lesson-index.json](../../evolution/lesson-index.json)：lesson 晋升索引。
+| Profile | 读取范围 | 触发条件 |
+|---|---|---|
+| `light` | AGENTS、registry、[activeContext.md](../../memory-bank/activeContext.md) | 默认启动、简单问答、低风险定位 |
+| `standard` | light + architecture/tech-stack + progress 最新条目 + LESSONS 摘要/Pinned/最近 3 条 | 普通代码、配置、构建/测试命令、模块边界问题 |
+| `full` | v5.6 完整 bootstrap_order | 治理路径、高风险、失败复盘、LESSONS/EVOLVE/memory/schema/hook 变更 |
 
-代理还应按需读取 [docs/agents/](.) 下的细则文档（lifecycle / lessons-policy / evolution-policy / safety-and-completion / hooks-and-commands）。
+预算检查：
+
+```bash
+python scripts/context_budget.py --profile light --json
+python scripts/context_budget.py --profile standard --json
+```
 
 ## 读取策略
 
 - 默认不通读 `docs/LESSONS_ARCHIVE.md`。
-- 命中标签、关键词、模块、同类失败时，再按需读取 archive。
+- 默认不通读完整 `docs/LESSONS.md`，只取 profile 声明的摘要/条目。
+- 命中标签、关键词、模块、同类失败时，再按需读取 archive 或完整 lesson。
 - 若 `memory-registry.yaml` 缺失，任务仍可继续，但必须在 CHANGELOG/LESSONS 中记录 memory harness 未完整。
 
 ## memory-bank 初始化清单（植入新/旧项目时使用）
@@ -60,9 +63,9 @@ L3 不应无限堆积。高频、严重、可复用、可验证的 lessons 必�
 
 ## 触发矩阵（场景 → vibe-* Skill → 文件）
 
-> 本仓库代理**只能触发** `.codex/skills/vibe-*` 与 `.claude/skills/vibe-*` 中的 skill。禁止使用通用 skill 名（如 spec-driven-development、planning-and-task-breakdown 等）作为触发器。
+> 本仓库代理**只能触发** `.codex/skills/vibe-*`、`.claude/skills/vibe-*` 与 `.github/skills/vibe-*` 中的 skill。禁止使用通用 skill 名（如 spec-driven-development、planning-and-task-breakdown 等）作为触发器。
 >
-> 治理四件套（`vibe-memory-check / vibe-guard / vibe-xcheck / vibe-evolve`）双源同步；其他 16 个 skill 仅在 `.codex/skills/` 中可用。
+> 治理四件套（`vibe-memory-check / vibe-guard / vibe-xcheck / vibe-evolve`）三向同步；入口 skill 不进 `.github/skills/`，由 AGENTS 和 project-modes 跳转。
 
 按生命周期阶段：
 

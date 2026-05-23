@@ -8,6 +8,7 @@ memory-bank/
 docs/
 evolution/
 scripts/
+  context_budget.py
   check_memory_consistency.py
   evolve_lessons.py
   hooks/
@@ -23,23 +24,15 @@ templates/
 
 ## 2. 安装到已有项目
 
-在项目根目录执行：
+推荐用安装器，默认轻量上下文与 lean skill set：
 
 ```bash
-unzip vibe-harness-v5.zip -d /tmp/vibe-harness-v5
-cp /tmp/vibe-harness-v5/vibe-harness-v5/AGENTS.md ./AGENTS.md
-cp -r /tmp/vibe-harness-v5/vibe-harness-v5/memory-bank ./
-cp -r /tmp/vibe-harness-v5/vibe-harness-v5/docs ./
-cp -r /tmp/vibe-harness-v5/vibe-harness-v5/evolution ./
-cp -r /tmp/vibe-harness-v5/vibe-harness-v5/scripts ./
-mkdir -p .codex .claude
-cp -r /tmp/vibe-harness-v5/vibe-harness-v5/.codex/skills ./.codex/
-cp /tmp/vibe-harness-v5/vibe-harness-v5/.codex/hooks.json ./.codex/hooks.json
-cp /tmp/vibe-harness-v5/vibe-harness-v5/.codex/config.toml.example ./.codex/config.toml.example
-cp -r /tmp/vibe-harness-v5/vibe-harness-v5/.claude/skills ./.claude/
-cp /tmp/vibe-harness-v5/vibe-harness-v5/.claude/settings.example.json ./.claude/settings.json
+python scripts/install_vibe_harness.py --target <project-root> --mode retrofit --context-profile light --skill-set lean
+python scripts/context_budget.py --profile light --json
 python scripts/check_memory_consistency.py --strict
 ```
+
+如需复现 v5.6 重治理形态，显式传 `--context-profile full --skill-set full`。
 
 ## 3. Codex 配置
 
@@ -105,6 +98,7 @@ python3 scripts/hooks/memory_stop_guard.py
 
 ```bash
 python scripts/check_memory_consistency.py --strict
+python scripts/context_budget.py --profile light --json
 python scripts/evolve_lessons.py --write
 python scripts/check_memory_consistency.py --strict
 ```

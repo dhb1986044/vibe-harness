@@ -25,6 +25,11 @@ codex_hooks = true
 <repo>/.codex/hooks.json
 ```
 
+跨平台命令约束：
+
+- Hook 命令必须使用仓库内实际脚本，并优先写成 `python "$(git rev-parse --show-toplevel)/scripts/hooks/<hook>.py"`。
+- 禁止在项目级 hook 配置中硬编码 `/usr/bin/env`、Linux 绝对路径或 Windows 专属盘符；同一模板必须能在 PowerShell 与 POSIX shell 中执行。
+
 最低要求：
 
 - `SessionStart`：注入 memory bootstrap 提醒。
@@ -57,6 +62,17 @@ Copilot **不具备 shell hook 通道**（无 SessionStart / UserPromptSubmit / 
    ```
 
 镜像策略：Copilot 优先读 `.github/skills/vibe-*`，与 `.codex/skills/vibe-*`、`.claude/skills/vibe-*` 通过 `python scripts/sync_vibe_skills.py --write` 保持字节级一致（仅治理四件套契约，`docs/` 子目录允许三端分歧）。
+
+安装器在所有模式下都应保留现有 `.github/copilot-instructions.md`，但必须补齐缺失的 `.github/instructions/governance.instructions.md`；`scripts/check_memory_consistency.py --strict` 会检查该文件及其 `applyTo` 覆盖面。v5.7 默认安装 `--context-profile light --skill-set lean`，需要旧重治理形态时显式传 `--context-profile full --skill-set full`。
+
+## Context Budget
+
+Codex SessionStart 只提示默认 profile，不再要求每次通读 LESSONS。预算命令：
+
+```bash
+python scripts/context_budget.py --profile light --json
+python scripts/context_budget.py --profile standard --json
+```
 
 ### Hook 与 Skill 的关系
 

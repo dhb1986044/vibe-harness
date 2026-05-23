@@ -4,6 +4,18 @@
 
 ## 初始化骨架（按时间倒序，最新的在最上面）
 
+## [2026-05-23] progress | v5.7 默认上下文 profile 与预算门禁
+- 已完成：将 harness 默认读取策略从固定 full bootstrap 改为 `read_policy.profiles` 三档；`light` 默认读取 AGENTS、registry、activeContext，预算 12KB；`standard` 读取架构/命令/最近进展与少量 LESSONS，预算 24KB；`full` 保留 v5.6 `bootstrap_order`。新增 `scripts/context_budget.py`，`check_memory_consistency.py` 接入 profile schema/budget lint；`install_vibe_harness.py` 新增 `--context-profile` 与 `--skill-set {lean,full}`，默认轻量安装且不删除目标已有 skill；Codex SessionStart 改为提示 profile 和 LESSONS 触发条件。同步更新 AGENTS、docs/agents、README_DEPLOYMENT、Copilot governance applyTo，并新增 L12。已执行 py_compile、light/standard/full budget、strict memory check、sync check、SessionStart smoke、三组安装器 dry-run、旧 registry warn-only 回归。关联 lessons：L1 L2 L3 L7 L8 L10 L11 L12。
+- 进行中：无。
+- 阻塞 / 风险：无当前阻塞。GUARD 风险等级：中；回滚方式为 `git restore` 本轮触达文件并删除新增 `scripts/context_budget.py`；残余风险是现有已安装项目需要重新运行 retrofit 或手动合并 AGENTS/registry 才能获得 light 默认。
+- 下一步：如需应用到 `platform_design`，先用 `install_vibe_harness.py --target D:/workspace/wl/platform_design --mode retrofit --context-profile light --skill-set lean --dry-run` 复核，不直接覆盖业务文件。
+
+## [2026-05-22] progress | platform_design 安装复盘后的 harness 加固
+- 已完成：根据 `D:/workspace/wl/platform_design` discovery 安装复盘，修复源仓 `.codex/hooks.json` 的 POSIX 专属 `/usr/bin/env` 命令，改为 PowerShell/POSIX 均可展开的 `python "$(git rev-parse --show-toplevel)/..."`；`.claude/settings.example.json` 改用 `python`；`scripts/install_vibe_harness.py` 增加缓存/本地产物跳过、缺失 Copilot governance instruction 补齐、缺失 Claude Stop hook 设置补齐且不覆盖已有配置；`scripts/check_memory_consistency.py` 增加 `.github/instructions/governance.instructions.md` 存在性与 `applyTo` 覆盖检查；`scripts/evolve_lessons.py` 修正 tags 写回，避免 JSON tags 从数组退化为字符串；`docs/agents/` 同步说明跨平台 hook 与安装器职责。目标项目同步应用同等修正，并补 `.claude/settings.json`、`.github/instructions/governance.instructions.md`，收窄原 `spec-driven-workflow-v1.instructions.md` 的 `applyTo`。新增 L11，归档 L4，运行 `python scripts/evolve_lessons.py --write`。关联 lessons：L1 L2 L7 L8 L9 L10 L11。
+- 进行中：无。
+- 阻塞 / 风险：未删除源仓与目标项目中已存在的 `scripts/**/__pycache__` 缓存目录，因为删除文件/目录需明确确认；这些目录已被 `.gitignore` 忽略，安装器后续不会再复制。残余风险是不同 agent 对 hook command 的执行 shell 可能存在差异，已用当前 PowerShell 路径做 smoke。
+- 下一步：等待用户确认是否删除已忽略的 `scripts/**/__pycache__` 缓存目录；若不删除，不影响版本控制或后续安装。
+
 ## [2026-05-22] progress | 首次 Git 发布到 GitHub
 - 已完成：确认当前目录不是 Git 工作树，远端 `https://github.com/dhb1986044/vibe-harness.git` 未返回可见分支；按首次发布处理。新增根 `.gitignore` 排除 Python 缓存、`.serena/` 本地工具状态、环境文件和 OS/editor 噪声；新增 `.gitattributes` 统一文本文件 LF；生成 `plans/commit-plan.md` 记录提交范围、检查项和回滚策略。已执行 lesson 引用回填、`python scripts/check_memory_consistency.py --strict`、基础敏感词扫描、Python 语法检查、`git diff --cached --check`，并创建首次内容提交 `5a8bc5c chore: publish vibe harness v5.6`。`git push -u origin main` 已成功创建远端 `main` 分支，`git ls-remote --heads origin main` 返回 `5a8bc5c1386367fa266b8ced6d51baa73943d564`。关联 lessons：L1 L2 L7 L8 L10。
 - 进行中：无。

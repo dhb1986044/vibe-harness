@@ -48,3 +48,23 @@
   - `evolution/lesson-index.json` schema_version → `v5.4`，新增 L8 条目（type=decision, maturity=verified）。
   - `memory-bank/memory-registry.yaml` v5.4，`lessons_policy` 下新增 `log_prefix` / `orphan_docs` 声明。
   - 灵感来源：Karpathy《LLM Wiki》gist 的 `log.md` 时间线约定 + Lint 操作（contradictions / stale claims / orphan pages / missing cross-refs / data gaps）。本仓库取「parseable log prefix」+「orphan docs」两项最小子集，不引入 contradiction detection / source_hash / sigma-guard。
+
+## [2026-05-22] promote | L11 hook/applyTo 安装自检候选
+- L11 `安装后必须实测 agent hook 与 Copilot applyTo`：已固化到现有载体，不新建 skill。
+  - `scripts/install_vibe_harness.py`：跳过缓存/本地产物；所有模式下补齐缺失的 Copilot governance instruction 与 Claude Stop hook 设置；不覆盖目标已有配置。
+  - `.codex/hooks.json` / `.claude/settings.example.json`：使用跨 PowerShell / POSIX shell 的 `python` 调用形式。
+  - `scripts/check_memory_consistency.py`：检查 `.github/instructions/governance.instructions.md` 存在性与 `applyTo` 覆盖面。
+  - `docs/agents/hooks-and-commands.md` / `project-modes.md`：记录安装器与 hook 跨平台约束。
+- L4 `harness 模板不应打包业务专属 skill`：本轮移入 archive，保留候选文件仅供后续 harness 纯净性问题命中时人工复查。
+- 验证：源仓与 `platform_design` 均运行 py_compile、memory check、hook smoke；目标项目 `sync_vibe_skills.py --check` PASS。
+
+## [2026-05-23] promote | lesson promotion candidates
+- Generated 2 promotion candidates.
+
+## [2026-05-23] promote | L12 context budget 固化
+- L12 `默认上下文必须预算化并按需展开`：已固化到现有载体，不新增 skill。
+  - `memory-bank/memory-registry.yaml`：新增 `read_policy.profiles.light/standard/full` 与 `expand_triggers`。
+  - `scripts/context_budget.py`：提供 profile 级字节/token 估算与预算状态。
+  - `scripts/check_memory_consistency.py`：把 profile schema 与 light/standard 预算纳入 strict lint。
+  - `scripts/install_vibe_harness.py`：默认 `--context-profile light --skill-set lean`，保留 full 兼容路径。
+- 判断：当前是治理策略和工具化门禁，不需要新 skill；若未来多仓库反复出现 profile 漂移，再考虑晋升为独立 XCheck。

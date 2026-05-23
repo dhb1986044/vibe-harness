@@ -56,6 +56,26 @@ VIBE_SKILLS_MIRRORS = (".codex/skills", ".github/skills")
 VIBE_SKILLS_MIRROR = ".codex/skills"
 VIBE_SKILL_NAMES = ["vibe-memory-check", "vibe-evolve", "vibe-guard", "vibe-xcheck"]
 
+COPILOT_GOVERNANCE_INSTRUCTION = ".github/instructions/governance.instructions.md"
+COPILOT_GOVERNANCE_APPLY_TO_REQUIRED = [
+    "memory-bank/**",
+    "docs/LESSONS*.md",
+    "docs/AI_CHANGELOG.md",
+    "docs/agents/**",
+    "evolution/**",
+    "AGENTS.md",
+    ".claude/skills/vibe-*/**",
+    ".codex/skills/vibe-*/**",
+    ".github/skills/vibe-*/**",
+    ".github/instructions/**",
+    ".github/copilot-instructions.md",
+    "scripts/hooks/**",
+    "scripts/sync_vibe_skills.py",
+    "scripts/check_memory_consistency.py",
+    "scripts/context_budget.py",
+    "scripts/evolve_lessons.py",
+]
+
 STATUS_ALLOWED = {"活跃", "已归档", "Pinned", "active", "archived", "pinned"}
 
 # v5.6: 项目模式与 harness 阶段（来自 v5.1 增量整合）。
@@ -307,6 +327,21 @@ def actionable(what: str, why: str, how: List[str]) -> str:
     return f"{what}\n         WHY:  {why}\n         HOW:\n{how_block}"
 
 
+def parse_frontmatter_value(text: str, key: str) -> str:
+    """Return a simple one-line YAML frontmatter value without a YAML dependency."""
+    in_frontmatter = False
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        stripped = line.strip()
+        if lineno == 1 and stripped == "---":
+            in_frontmatter = True
+            continue
+        if in_frontmatter and stripped == "---":
+            break
+        if in_frontmatter and line.startswith(f"{key}:"):
+            return line.split(":", 1)[1].strip().strip("\"'")
+    return ""
+
+
 def check_referenced_paths() -> List[str]:
     """v5.1 L2 reference-integrity check.
 
@@ -433,7 +468,50 @@ def check_referenced_paths() -> List[str]:
                     ],
                 ))
 
-    # 6. v5.1 ghost-file linter (lesson L5 candidate).
+    # 6. Copilot governance applyTo instruction must exist and cover the
+    # governance paths described by AGENTS.md / memory-registry.yaml.
+    copilot_entry = ROOT / ".github" / "copilot-instructions.md"
+    governance_instruction = ROOT / COPILOT_GOVERNANCE_INSTRUCTION
+    governance_declared = (
+        copilot_entry.exists()
+        or (registry.exists() and COPILOT_GOVERNANCE_INSTRUCTION in registry.read_text(encoding="utf-8", errors="ignore"))
+        or (registry.exists() and ".github/instructions/" in registry.read_text(encoding="utf-8", errors="ignore"))
+    )
+    if governance_declared and not governance_instruction.exists():
+        errors.append(actionable(
+            what=f"Copilot governance instruction missing: {COPILOT_GOVERNANCE_INSTRUCTION}",
+            why="AGENTS.md and memory-registry.yaml describe Copilot's governance-face applyTo "
+                "safety net. If the file is absent, Copilot loses the passive MEMORY_CHECK / "
+                "sync reminder for governance edits.",
+            how=[
+                "Copy .github/instructions/governance.instructions.md from the harness source",
+                "Or remove the Copilot applyTo references from AGENTS.md / memory-registry.yaml if Copilot is intentionally unsupported",
+            ],
+        ))
+    elif governance_instruction.exists():
+        gov_text = governance_instruction.read_text(encoding="utf-8", errors="ignore")
+        apply_to = parse_frontmatter_value(gov_text, "applyTo")
+        if not apply_to:
+            errors.append(actionable(
+                what=f"{COPILOT_GOVERNANCE_INSTRUCTION} missing frontmatter `applyTo`",
+                why="GitHub Copilot only loads this instruction automatically when applyTo matches touched files.",
+                how=["Add an `applyTo` value covering the governance paths in memory-registry.yaml"],
+            ))
+        else:
+            missing_apply_to = [p for p in COPILOT_GOVERNANCE_APPLY_TO_REQUIRED if p not in apply_to]
+            if missing_apply_to:
+                errors.append(actionable(
+                    what=f"{COPILOT_GOVERNANCE_INSTRUCTION} applyTo misses governance paths: "
+                         + ", ".join(missing_apply_to),
+                    why="Copilot has no shell Stop hook; missing applyTo coverage means some governance edits "
+                        "won't receive the passive MEMORY_CHECK / sync reminder.",
+                    how=[
+                        f"Add the missing path patterns to `{COPILOT_GOVERNANCE_INSTRUCTION}` frontmatter",
+                        "Keep the list semantically aligned with memory-registry.yaml `governance_paths`",
+                    ],
+                ))
+
+    # 7. v5.1 ghost-file linter (lesson L5 candidate).
     # vibe-* skills (SKILL.md + docs/) must not reference deprecated ghost
     # files or directories that were removed during the v5.1 cleanup. Lines
     # that explicitly forbid the ghost (negation context) are allowed because
@@ -581,6 +659,94 @@ def check_log_prefix() -> List[str]:
                     ],
                 ))
     return warnings_out
+
+
+def check_context_profiles() -> Tuple[List[str], List[str]]:
+    """v5.7 read_policy profile + context budget lint.
+
+    Older registries did not have profiles. Treat that case as WARN for
+    backwards compatibility, but enforce schema/budget once profiles exist.
+    """
+    errors: List[str] = []
+    warnings: List[str] = []
+    registry = ROOT / "memory-bank/memory-registry.yaml"
+    if not registry.exists():
+        return errors, warnings
+
+    try:
+        import context_budget  # type: ignore
+    except Exception as exc:
+        errors.append(actionable(
+            what="scripts/context_budget.py is not importable",
+            why="v5.7 read_policy profiles rely on the budget tool for schema and size checks.",
+            how=[
+                "Restore scripts/context_budget.py from the harness source",
+                f"Fix the import error: {exc}",
+            ],
+        ))
+        return errors, warnings
+
+    text = read(registry)
+    default_profile, profiles, has_profiles = context_budget.parse_registry_profiles(text)
+    if not has_profiles:
+        warnings.append(
+            "memory-registry.yaml has no read_policy.profiles; treating as legacy full bootstrap"
+        )
+        return errors, warnings
+
+    required = {"light", "standard", "full"}
+    missing = sorted(required - set(profiles))
+    if missing:
+        errors.append(actionable(
+            what="memory-registry.yaml missing read_policy profiles: " + ", ".join(missing),
+            why="v5.7 requires light/standard/full so agents can keep normal tasks low-token "
+                "while preserving the full governance path.",
+            how=["Add read_policy.profiles.light, .standard, and .full"],
+        ))
+
+    if default_profile not in profiles:
+        errors.append(actionable(
+            what=f"read_policy.default_profile points to unknown profile: {default_profile}",
+            why="SessionStart and budget checks need a valid default read profile.",
+            how=["Set read_policy.default_profile to one of: light | standard | full"],
+        ))
+    elif default_profile != "light":
+        warnings.append(
+            f"read_policy.default_profile is '{default_profile}', expected 'light' for low-token default"
+        )
+
+    bootstrap = context_budget._parse_bootstrap_order(text)
+    full_files = profiles.get("full", {}).get("files", [])
+    if bootstrap and full_files and list(full_files) != bootstrap:
+        errors.append(actionable(
+            what="read_policy.profiles.full.files does not match legacy bootstrap_order",
+            why="full profile is the compatibility path for v5.6 behavior; drift breaks old runbooks.",
+            how=["Make profiles.full.files exactly match read_policy.bootstrap_order"],
+        ))
+
+    for profile in ("light", "standard"):
+        if profile not in profiles:
+            continue
+        try:
+            report = context_budget.profile_report(ROOT, profile)
+        except Exception as exc:
+            errors.append(f"context budget failed for profile {profile}: {exc}")
+            continue
+        if report.get("over_budget"):
+            errors.append(actionable(
+                what=(
+                    f"context profile {profile} exceeds budget: "
+                    f"{report.get('total_bytes')}/{report.get('budget_bytes')} bytes"
+                ),
+                why="Default context must stay bounded; otherwise every session pays the governance cost.",
+                how=[
+                    "Shorten AGENTS.md / activeContext.md / registry text",
+                    "Move details into docs/agents/ and reference them only via standard/full triggers",
+                    f"Re-run `python scripts/context_budget.py --profile {profile} --json`",
+                ],
+            ))
+
+    return errors, warnings
 
 
 def check(strict: bool = False) -> Tuple[List[str], List[str]]:
@@ -752,6 +918,9 @@ def check(strict: bool = False) -> Tuple[List[str], List[str]]:
         for key in ["agent_contract", "lessons", "lesson_index", "memory_consistency"]:
             if key not in text:
                 warnings.append(f"memory-registry.yaml missing expected key text: {key}")
+        profile_errors, profile_warnings = check_context_profiles()
+        errors.extend(profile_errors)
+        warnings.extend(profile_warnings)
 
     # v5.1: L2 reference-integrity checks (paths and scripts referenced by
     # harness-governance documents must really exist on disk).

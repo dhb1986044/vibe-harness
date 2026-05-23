@@ -1,5 +1,37 @@
 # AI ChangeLog
 
+## [2026-05-23] changelog | v5.7 默认上下文 profile 与预算门禁
+- 范围：`AGENTS.md`、`memory-bank/{memory-registry,activeContext,progress}.md`、`scripts/{context_budget,check_memory_consistency,install_vibe_harness}.py`、`scripts/hooks/codex_session_start.py`、`.github/instructions/governance.instructions.md`、`docs/agents/{memory-model,lifecycle,safety-and-completion,hooks-and-commands,project-modes}.md`、`README_DEPLOYMENT.md`、`docs/LESSONS.md`、`evolution/lesson-index.json`、`evolution/promotion-log.md`。
+- 变更：
+  - **profile 化读取**：registry 升至 v5.7，新增 `read_policy.default_profile` 与 `light / standard / full`；`full` 保留 v5.6 bootstrap_order 兼容路径。
+  - **预算工具**：新增 `scripts/context_budget.py --profile light|standard|full --json`，输出文件/切片清单、字节数、粗略 token、预算状态。
+  - **checker 加固**：`check_memory_consistency.py` 校验 profile schema、默认 `light`、`full` 与 legacy bootstrap 等价，并把 light/standard 超预算视为 ERROR。
+  - **安装器加固**：`install_vibe_harness.py` 新增 `--context-profile` 与 `--skill-set {lean,full}`；默认 lean 不删除目标既有 skill，full 可复现 v5.6 重治理形态。
+  - **SessionStart 降噪**：Codex SessionStart 只提示默认 profile 和 LESSONS 触发条件，不再要求每轮读取完整 LESSONS。
+  - **经验沉淀**：新增 L12「默认上下文必须预算化并按需展开」，评估为保留 lesson，不新增 skill。
+- 原因：v5.6 默认 bootstrap 约 52KB，普通任务也会支付 full governance 成本；本次把安全能力保留在 full profile，把默认路径降为 light，降低 token 消耗且保持可回滚。
+- 风险等级：中。影响代理入口契约、安装结果和 memory checker；通过保留 `bootstrap_order`、`full` profile、旧命令和 WARN-only 旧 registry 兼容降低风险。
+- 复杂度影响评分：5/10。
+- 验证方式：`python -m py_compile scripts/install_vibe_harness.py scripts/check_memory_consistency.py scripts/context_budget.py scripts/hooks/codex_session_start.py`；`python scripts/context_budget.py --profile light --json`；`python scripts/context_budget.py --profile standard --json`；`python scripts/context_budget.py --profile full --json`；`python scripts/check_memory_consistency.py --strict`；`python scripts/sync_vibe_skills.py --check`；安装器三组 dry-run；Codex SessionStart smoke。
+- 回滚方式：`git restore AGENTS.md memory-bank/memory-registry.yaml memory-bank/activeContext.md memory-bank/progress.md scripts/context_budget.py scripts/check_memory_consistency.py scripts/install_vibe_harness.py scripts/hooks/codex_session_start.py .github/instructions/governance.instructions.md docs/agents README_DEPLOYMENT.md docs/LESSONS.md evolution/lesson-index.json evolution/promotion-log.md docs/AI_CHANGELOG.md`，并删除新增 `scripts/context_budget.py` 如需完全回退。
+- 关联 lessons：L1 L2 L3 L7 L8 L10 L11 L12。
+
+## [2026-05-22] changelog | platform_design 安装复盘后的 hook 与 Copilot 治理加固
+- 范围：`.codex/hooks.json`、`.claude/settings.example.json`、`scripts/{install_vibe_harness,check_memory_consistency,evolve_lessons}.py`、`docs/agents/{hooks-and-commands,project-modes}.md`、`docs/LESSONS.md`、`docs/LESSONS_ARCHIVE.md`、`evolution/lesson-index.json`、`evolution/promotion-log.md`、`evolution/candidates/`、`memory-bank/{activeContext,progress}.md`，并同步修正 `D:/workspace/wl/platform_design` 的安装结果。
+- 变更：
+  - **跨平台 hook**：Codex hook 命令从 `/usr/bin/env python3 ...` 改为 `python "$(git rev-parse --show-toplevel)/..."`；Claude 示例改为 `python scripts/hooks/memory_stop_guard.py`。
+  - **安装器加固**：`install_vibe_harness.py` 跳过 `__pycache__`、`.pyc`、`.git`、`.serena`、虚拟环境和本地缓存；所有模式下补齐缺失的 `.github/instructions/governance.instructions.md` 与 `.claude/settings.json`，但保留目标项目已有配置。
+  - **checker 加固**：`check_memory_consistency.py` 新增 Copilot governance instruction 存在性检查，并验证 `applyTo` 覆盖 memory/LESSONS/evolution/vibe skills/hooks/checker 等治理路径。
+  - **evolve 写回稳固**：`evolve_lessons.py` 写回 `lesson-index.json` 时将 markdown tags 单元格解析回数组，避免把既有 JSON tags schema 退化成字符串。
+  - **目标项目落地**：`platform_design` 补 `.claude/settings.json` 与 `.github/instructions/governance.instructions.md`，收窄原 `spec-driven-workflow-v1.instructions.md` 的 `applyTo` 到 SPEC/ADR/plans/.copilot-tracking，降低与 AGENTS 生命周期的叠加风险。
+  - **经验沉淀**：新增 L11「安装后必须实测 agent hook 与 Copilot applyTo」，归档 L4 以保持 active 窗口为 10 条；`evolve_lessons.py --write` 生成 L11 晋升候选。
+- 原因：安装到 `platform_design` 后的复盘显示，源仓模板虽然通过 memory check，但目标环境存在“配置看似安装、实际 hook 不触发”和“文档声明 Copilot applyTo、文件缺失”的静默风险。业内实践也要求自动化控制必须能被实际验证，不能只停留在文档约定。
+- 风险等级：中。影响安装入口、hook 触发和 Copilot 指令注入；本次保持无新依赖、不覆盖既有目标配置、discovery 阶段仍 warn-only。
+- 复杂度影响评分：4/10。
+- 验证方式：`python -m py_compile scripts/install_vibe_harness.py scripts/check_memory_consistency.py`；源仓与目标项目 `python scripts/check_memory_consistency.py --strict`；目标项目 `python "$(git rev-parse --show-toplevel)/scripts/hooks/codex_session_start.py"` 与 `codex_stop_memory_guard.py` smoke；`python scripts/sync_vibe_skills.py --check`；安装器 skip 函数正/负例；`python scripts/check_memory_consistency.py --update-refs`。
+- 回滚方式：`git restore .codex/hooks.json .claude/settings.example.json scripts/install_vibe_harness.py scripts/check_memory_consistency.py docs/agents/hooks-and-commands.md docs/agents/project-modes.md docs/LESSONS.md docs/LESSONS_ARCHIVE.md evolution/lesson-index.json evolution/promotion-log.md memory-bank/activeContext.md memory-bank/progress.md`；目标项目对应路径用 `git -C D:/workspace/wl/platform_design restore <path>` 回滚，新增 `.claude/settings.json` / `.github/instructions/governance.instructions.md` / L11 candidate 如需移除须先确认删除。
+- 关联 lessons：L1 L2 L7 L8 L9 L10 L11。
+
 ## [2026-05-22] changelog | 首次 Git 发布准备
 - 范围：`.gitignore`、`.gitattributes`、`plans/commit-plan.md`、`memory-bank/activeContext.md`、`memory-bank/progress.md`、`docs/AI_CHANGELOG.md`。
 - 变更：

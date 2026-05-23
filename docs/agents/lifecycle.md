@@ -13,7 +13,7 @@
 INIT -> MEMORY_BOOTSTRAP -> PLAN -> ALPHA -> REVIEW -> EXEC -> XCHECK -> GUARD -> CHANGELOG -> LESSONS -> EVOLVE -> MEMORY_CHECK -> COMPLETE
 ```
 
-简单问答可跳过落盘；只要涉及代码、脚本、配置、文档、技能、memory、lessons、发布、依赖，必须进入完整生命周期。
+简单问答和低风险定位使用 `light` profile，可跳过落盘。普通代码/配置任务使用 `standard` profile，并按最小必要阶段执行。只有治理路径、高风险、失败复盘、memory/LESSONS/evolution/hook/安装器变更才使用 `full` profile 与完整闭环。
 
 ## INIT
 
@@ -31,7 +31,7 @@ INIT -> MEMORY_BOOTSTRAP -> PLAN -> ALPHA -> REVIEW -> EXEC -> XCHECK -> GUARD -
 
 ## MEMORY_BOOTSTRAP
 
-详见 [memory-model.md](memory-model.md)。
+按 [memory-model.md](memory-model.md) 的 `read_policy` profile 执行。默认 `light`；触发治理路径或高风险时升到 `full`。
 
 ## PLAN
 
@@ -135,7 +135,7 @@ GUARD 是"系统风险评估门"。它回答：这次改动会不会伤到系统
 
 ## CHANGELOG
 
-涉及仓库状态变化时，必须更新 [docs/AI_CHANGELOG.md](../AI_CHANGELOG.md)。
+涉及非平凡仓库状态变化时，必须更新 [docs/AI_CHANGELOG.md](../AI_CHANGELOG.md)。纯问答、只读排查、无状态变化不写。
 
 至少包含：
 
@@ -149,4 +149,4 @@ GUARD 是"系统风险评估门"。它回答：这次改动会不会伤到系统
 
 ## LESSONS / EVOLVE / MEMORY_CHECK
 
-详见 [lessons-policy.md](lessons-policy.md)、[evolution-policy.md](evolution-policy.md) 与 AGENTS.md §16。
+LESSONS/EVOLVE 只在失败、返工、新风险、可复用流程规则或经验库维护时触发，不是普通任务的固定写入项。MEMORY_CHECK 由治理路径触发清单决定。详见 [lessons-policy.md](lessons-policy.md)、[evolution-policy.md](evolution-policy.md) 与 [safety-and-completion.md](safety-and-completion.md)。

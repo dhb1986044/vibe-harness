@@ -107,6 +107,20 @@ def target(row):
     return "lesson"
 
 
+def parse_tags(value):
+    if isinstance(value, list):
+        return value
+    text = str(value).strip()
+    if text.startswith("[") and text.endswith("]"):
+        inner = text[1:-1].strip()
+        if not inner:
+            return []
+        return [part.strip() for part in inner.split(",") if part.strip()]
+    if not text:
+        return []
+    return [text]
+
+
 def load_existing_index():
     if not INDEX.exists():
         return {"schema_version": "v5.6", "lessons": []}, {}
@@ -141,7 +155,7 @@ def merge_item(row, existing):
     item.update({
         "id": row["id"],
         "title": row["title"],
-        "tags": row["tags"],
+        "tags": parse_tags(row["tags"]),
         "priority": row["priority"],
         "status": row["status"],
         "promotion_score": s,

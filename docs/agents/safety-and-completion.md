@@ -2,7 +2,7 @@
 
 > **Layer B 摘要**
 > - **何时该读**：准备 COMPLETE、出现高风险改动需要 GUARD、不确定某次删除 / 重命名 是否需先评估回滚、思考是否该跳过 MEMORY_CHECK。
-> - **包含内容**：安全与完整性原则（不提交密钥 / 评估回滚 / 保护 in-progress）；完成清单（用户成功标准 + XCHECK + GUARD + CHANGELOG + LESSONS + EVOLVE + memory-bank 同步 + MEMORY_CHECK）；MEMORY_CHECK 阻断规则。
+> - **包含内容**：安全与完整性原则（不提交密钥 / 评估回滚 / 保护 in-progress）；完成清单（用户成功标准 + XCHECK + 按触发条件执行 GUARD / CHANGELOG / LESSONS / EVOLVE / MEMORY_CHECK）；MEMORY_CHECK 阻断规则。
 > - **不在此处**：GUARD 的输出模板 / XCHECK 检查项 → [lifecycle.md](lifecycle.md)；hook 脚本位置 → [hooks-and-commands.md](hooks-and-commands.md)；Guard / XCheck skill 本身 → `.claude/skills/vibe-guard/SKILL.md`、`.claude/skills/vibe-xcheck/SKILL.md`。
 
 > 本文件展开 [AGENTS.md](../../AGENTS.md) §20 + §21。
@@ -23,11 +23,9 @@
 - 用户成功标准已满足。
 - XCHECK 已通过，或未执行原因和替代证据已明确记录。
 - GUARD 已通过，或风险与缓解已明确记录。
-- [docs/AI_CHANGELOG.md](../AI_CHANGELOG.md) 已更新，或说明为何无需更新。
-- [docs/LESSONS.md](../LESSONS.md) 已更新/确认无需更新。
-- EVOLVE 已判断是否需要晋升经验。
-- [memory-bank/](../../memory-bank/) 已同步到当前状态。
-- MEMORY_CHECK 已通过，或当前任务完全不涉及 memory/harness 且说明原因。
+- 非平凡仓库状态变化已记录 [docs/AI_CHANGELOG.md](../AI_CHANGELOG.md)。
+- 失败、返工、新风险或可复用流程规则已写入 [docs/LESSONS.md](../LESSONS.md)，并判断是否 EVOLVE。
+- 触达 memory / harness / governance 路径时，[memory-bank/](../../memory-bank/) 已同步且 MEMORY_CHECK 已通过。
 
 若任一项缺失，不得标记为 COMPLETE。
 
@@ -46,8 +44,14 @@ docs/AI_CHANGELOG.md
 evolution/**
 .codex/skills/vibe-*/**
 .claude/skills/vibe-*/**
+.github/skills/vibe-*/**
+.github/instructions/**
+.github/copilot-instructions.md
 scripts/hooks/**
 scripts/sync_vibe_skills.py
+scripts/check_memory_consistency.py
+scripts/context_budget.py
+scripts/evolve_lessons.py
 ```
 
 失败不得 COMPLETE，必须回到 REVIEW 或 EXEC 修复。

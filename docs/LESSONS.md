@@ -1,9 +1,9 @@
 # Lessons
 
 ## Active Summary
-- 默认读取范围：`Pinned` 条目 + 最近 `5~10` 条 `活跃` 条目
+- 默认读取范围：按 `read_policy.default_profile` 读取；`full` 才读取 `Pinned` 条目 + 最近 `5~10` 条 `活跃` 条目
 - 当前 `Pinned`：L1
-- 当前活跃窗口：`L1-L10`
+- 当前活跃窗口：`L1-L3, L5-L12`
 - 归档库：`docs/LESSONS_ARCHIVE.md`
 - 规则说明：`docs/LESSONS_RULES.md`
 - 字段约定（v5.2+）：每条 lesson 必须带 `类型(type)` 与 `成熟度(maturity)`，定义见 `LESSONS_RULES.md`。
@@ -16,13 +16,15 @@
 | L1 | 不发明命令 | guideline | proven | [Process,Command] | P1 | Pinned |
 | L2 | Memory check 失败不得完成 | process | proven | [Memory,Guard] | P1 | 活跃 |
 | L3 | AGENTS.md 是 Map 不是 Manual | decision | proven | [AGENTS,Architecture] | P2 | 活跃 |
-| L4 | harness 模板不应打包业务专属 skill | guideline | verified | [Skills,Architecture] | P2 | 活跃 |
+| L4 | harness 模板不应打包业务专属 skill | guideline | verified | [Skills,Architecture] | P2 | 已归档 |
 | L5 | Skill 三层一致性（description / SKILL.md / docs/） | pitfall | proven | [Skills,Lint] | P1 | 活跃 |
 | L6 | Lesson 需带 type+maturity 字段 | decision | verified | [Lessons,Schema] | P2 | 活跃 |
 | L7 | Lesson 引用追踪闭环（v5.3） | process | verified | [Lessons,Tracking] | P2 | 活跃 |
 | L8 | 时间序日志标题前缀与孤儿页面守护（v5.4） | decision | verified | [Lint,Logs,Docs] | P2 | 活跃 |
 | L9 | Copilot 集成与三向同步（v5.5） | decision | verified | [Agents,Integration,Copilot] | P2 | 活跃 |
 | L10 | 项目模式与 phase 切档（v5.6） | decision | verified | [Onboarding,Phases,Hooks] | P2 | 活跃 |
+| L11 | 安装后必须实测 agent hook 与 Copilot applyTo | pitfall | verified | [Hooks,Copilot,Install] | P1 | 活跃 |
+| L12 | 默认上下文必须预算化并按需展开 | decision | verified | [Context,Tokens,Process] | P1 | 活跃 |
 
 ## Active Lessons
 
@@ -52,15 +54,6 @@
 - 修复策略：参照 `harness-creator` 的 "AGENTS.md is a Map, Not a Manual" 原则，将 AGENTS.md 控制在 ~120 行只做导航 + 核心契约骨架，详细内容下沉到 `docs/agents/*.md`；vibe-* 改为单源 + 镜像；扩展 `check_memory_consistency.py` 增加 L2 引用一致性检查（错误信息 WHAT+WHY+HOW 三段式）。
 - 可复用模式：契约文件应当是 Map（导航）；策略详情应当是 Reference（按需读取）；文档间引用必须有自动化 linter 守护。
 - 建议升级为 Guard/XCheck/Skill 规则：已固化为 v5.1 AGENTS.md 模板 + `scripts/sync_vibe_skills.py` + `check_memory_consistency.check_referenced_paths()`。
-
-## L4 harness 模板不应打包业务专属 skill
-- 类型：guideline
-- 成熟度：verified
-- 场景：vibe-harness-v5 从 badcase-miner 项目移植过来的 vibe-* skill 中，`vibe-knowledge-modifier` 详细说明引用了 `evolution_analysis_*.md`、特定规则集等 badcase-miner 业务附件；`vibe-review` 硬编码了 L2-L9 与该项目业务耦合的教训编号；`vibe-data`/`vibe-prompt`/`vibe-parallel` 也不属于通用治理闭环。
-- 风险：（1）使用者安装 harness 后获得不可用的 skill，调用时读不到附件报错；（2）硬编码的教训编号会在新项目被误读；（3）增加 harness 表面积但不提供价值。
-- 修复策略：纳入 skill 前按三问检查：（a）能否在不依赖任何业务附件的情况下运行？（b）内部是否硬编码了某项目的教训编号/名字/列号？（c）是否是"仅治理闭环"中任一环节的一部分（INIT/PLAN/EXEC/XCHECK/GUARD/CHANGELOG/LESSONS/EVOLVE/MEMORY_CHECK）？任何一项为否则不进入 harness。
-- 可复用模式：harness 纯净原则 — 只装 universal governance，不装 example workflow；业务 skill 留在业务 repo。
-- 建议升级为 Guard/XCheck/Skill 规则：待观察；若同类问题出现第 2 次，则在 `vibe-evolve` 中增加"new skill admission checklist"门禁。
 
 ## L5 Skill 三层一致性（description / SKILL.md 正文 / docs/）
 - 类型：pitfall
@@ -115,3 +108,21 @@
 - 修复策略：（a）`memory-bank/memory-registry.yaml` 顶层引入 `project_mode ∈ {new_project, vibe_managed_legacy, unmanaged_legacy}` 与 `harness_phase ∈ {discovery_only, shadow_harness, soft_gate, managed_harness}`，并集中声明 `governance_paths` 与 `hook_policy`。（b）`scripts/check_memory_consistency.py` 新增 `parse_registry_phase()` 与 `--print-phase` / `--warn-only`，并按 phase 自动降级（discovery/shadow 全部转 warn）。（c）`scripts/hooks/{memory_stop_guard,codex_stop_memory_guard}.py` 先调 `--print-phase`，按 phase 决定 block 策略：warn-only / 治理面 only / 全量 block。（d）入口 skill 四件套 `vibe-bootstrap` / `vibe-retrofit` / `vibe-discovery` / `vibe-exec` 分别承接三类项目接入流；**显式不纳入三向镜像**，由各 agent 自行维护。（e）`scripts/install_vibe_harness.py` 加固：识别 Map-style AGENTS.md，retrofit 模式默认写 `AGENTS.v5.6.draft.md` 而非覆盖，必须 `--overwrite-agents` 才强制替换。（f）`scripts/discover_project.py` 引入只读侦察。
 - 可复用模式：harness 接入策略必须按项目"治理熟度"分档而非一刀切；hook 的 block/warn 行为应当由 registry 声明的 phase 驱动，而不是硬编码；入口 skill 是一次性接入工具，与日常生命周期 skill 分层，**不必三向同步**；脚手架工具（install / discover）面对 Map 化的契约文件须做防覆盖保护，draft 文件优先于直接替换。
 - 建议升级为 Guard/XCheck/Skill 规则：保留为 decision lesson；phase 驱动的 hook 行为已固化于 `memory_stop_guard.py` / `codex_stop_memory_guard.py`；如未来要在 PreToolUse 层做更细的"只允许只读工具 / 仅治理面写入"分档，可在此基础上加 `pre_tool_phase_guard.py`。
+
+## L11 安装后必须实测 agent hook 与 Copilot applyTo
+- 类型：pitfall
+- 成熟度：verified
+- 场景：`platform_design` discovery 安装后复盘发现：Codex hook 配置使用 `/usr/bin/env python3`，在 Windows/PowerShell 环境无法执行；文档与 registry 声明 `.github/instructions/governance.instructions.md`，但 discovery/retrofit 未安装该文件；项目原有 Copilot instruction 对 `**` 全量生效，可能与 harness 生命周期叠加冲突。
+- 风险：（1）Codex/Claude 自动门禁看似已安装但实际不触发；（2）Copilot 缺少治理面 `applyTo` 被动注入，治理文件改动不会收到 MEMORY_CHECK / 三向同步提醒；（3）宽作用域 instruction 与 AGENTS.md 生命周期竞争，导致代理为满足所有模板而过度产出。
+- 修复策略：安装器必须跳过缓存/本地产物，所有模式下补齐缺失的 Copilot governance instruction 与 Claude Stop hook 设置但不覆盖已有配置；Codex hook 命令必须跨 PowerShell / POSIX shell；`check_memory_consistency.py` 必须检查 governance instruction 文件存在与 `applyTo` 覆盖面；目标项目需要收窄既有 Copilot instruction 的 `applyTo`。
+- 可复用模式：harness 安装完成不等于接入完成；至少实测一条 Session/Stop hook 命令、一次 Copilot governance applyTo 存在性检查、一次 `sync_vibe_skills --check` 和一次 memory check。
+- 建议升级为 Guard/XCheck/Skill 规则：已固化到 `scripts/install_vibe_harness.py`、`.codex/hooks.json`、`.claude/settings.example.json`、`scripts/check_memory_consistency.py` 与 `docs/agents/hooks-and-commands.md`。
+
+## L12 默认上下文必须预算化并按需展开
+- 类型：decision
+- 成熟度：verified
+- 场景：v5.6 的默认 MEMORY_BOOTSTRAP 会读取 AGENTS、registry、progress、architecture、tech-stack、LESSONS、lesson-index 等约 50KB 内容；普通任务还会额外触发 skill 正文和工具输出，导致 token 成本长期偏高。
+- 风险：（1）每轮会话为低风险任务支付 full governance 成本；（2）重要规则被大量历史上下文稀释；（3）业务项目接入 harness 后对 token 成本敏感，容易绕开治理。
+- 修复策略：把 `read_policy` 改为 `light / standard / full` 三档；默认 `light` 只读契约、registry 与当前焦点；普通任务按需升到 `standard`；治理路径、高风险、失败复盘和 LESSONS/EVOLVE/memory 变更才升到 `full`；用 `scripts/context_budget.py` 和 checker 守住预算。
+- 可复用模式：上下文不是越多越安全；稳定契约进 AGENTS，真实事实进 profile，历史经验只按风险展开，并用预算工具量化。
+- 建议升级为 Guard/XCheck/Skill 规则：已固化为 `read_policy.profiles`、`scripts/context_budget.py` 与 `check_memory_consistency` 的 profile/budget lint；无需新增 skill。
