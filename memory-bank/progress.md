@@ -4,6 +4,18 @@
 
 ## 初始化骨架（按时间倒序，最新的在最上面）
 
+## [2026-06-16] progress | lean skill 瘦身提交发布
+- 已完成：根据用户当前指令准备提交并推送默认 lean skill 面收窄变更；生成 `plans/commit-plan.md`，提交范围限定在 `D:/workspace/vibe-harness-v5`，不触达外部项目。
+- 进行中：执行提交前门禁、stage、commit、push。
+- 阻塞 / 风险：无当前阻塞。风险等级：中；发布后如需回退，优先追加 revert/fix commit，不做强推。
+- 下一步：完成 `git commit` 与 `git push`，最终 commit hash 以 Git 历史和交付回复为准。
+
+## [2026-06-16] progress | 默认 lean skill 面收窄
+- 已完成：将 `scripts/install_vibe_harness.py` 的 Codex lean 默认技能集从 14 个收窄为核心 8 个：`vibe-memory-check`、`vibe-evolve`、`vibe-guard`、`vibe-xcheck`、`vibe-bootstrap`、`vibe-retrofit`、`vibe-discovery`、`vibe-exec`；保留完整 `.codex/skills/vibe-*` 源码，`--skill-set full` 仍复制完整技能库。同步更新 `AGENTS.md`、`docs/agents/{memory-model,project-modes,hooks-and-commands,onboarding/*}.md`、`README_DEPLOYMENT.md` 与 L12，补入 `L0-L3` 风险分级、默认核心 skill 路由和 optional / advanced / source-only 说明。
+- 进行中：无。
+- 阻塞 / 风险：无当前阻塞。GUARD 风险等级：中；已通过 py_compile、安装器三模式 dry-run、light/standard budget、sync check、strict memory check、`git diff --check` 与新增行 external-project guard。回滚方式为 `git restore` 本轮触达文件。
+- 下一步：如需进一步压缩，可在下一票评估 optional / advanced skill 的文档入口是否移入独立索引；本轮不删除 skill 源码、不新增日志索引。
+
 ## [2026-05-23] progress | v5.7 默认上下文 profile 与预算门禁
 - 已完成：将 harness 默认读取策略从固定 full bootstrap 改为 `read_policy.profiles` 三档；`light` 默认读取 AGENTS、registry、activeContext，预算 12KB；`standard` 读取架构/命令/最近进展与少量 LESSONS，预算 24KB；`full` 保留 v5.6 `bootstrap_order`。新增 `scripts/context_budget.py`，`check_memory_consistency.py` 接入 profile schema/budget lint；`install_vibe_harness.py` 新增 `--context-profile` 与 `--skill-set {lean,full}`，默认轻量安装且不删除目标已有 skill；Codex SessionStart 改为提示 profile 和 LESSONS 触发条件。同步更新 AGENTS、docs/agents、README_DEPLOYMENT、Copilot governance applyTo，并新增 L12。已执行 py_compile、light/standard/full budget、strict memory check、sync check、SessionStart smoke、三组安装器 dry-run、旧 registry warn-only 回归。关联 lessons：L1 L2 L3 L7 L8 L10 L11 L12。
 - 进行中：无。

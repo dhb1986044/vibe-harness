@@ -9,7 +9,7 @@
 1. 备份旧 AGENTS 与 skills。
 2. 生成 `memory-registry.yaml`。
 3. 生成或修复 `lesson-index.json`。
-4. 将 `vibe-init / vibe-alpha / vibe-omega` 移入 `_legacy`。
-5. 安装核心 v5 skills。
+4. 将目标项目中过时或项目专属的旧 skill 标为 legacy；源 harness 仓库保留 optional / source-only skill，不做物理删除。
+5. 安装核心 v5 skills（lean 默认仅核心 8 个）。
 6. hooks 先 warn-only，观察 1~2 周。
 7. 再进入 soft_gate / managed_harness。

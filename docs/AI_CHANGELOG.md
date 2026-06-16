@@ -1,5 +1,21 @@
 # AI ChangeLog
 
+## [2026-06-16] changelog | 默认 lean skill 面收窄
+- 范围：`AGENTS.md`、`README_DEPLOYMENT.md`、`scripts/install_vibe_harness.py`、`docs/agents/{memory-model,project-modes,hooks-and-commands,onboarding/EXISTING_VIBE_PROJECT_RETROFIT_MANUAL,onboarding/LEGACY_SKILLS_MIGRATION}.md`、`docs/LESSONS.md`、`evolution/lesson-index.json`、`memory-bank/{activeContext,progress}.md`。
+- 变更：
+  - **默认安装面收窄**：`install_vibe_harness.py` 的 `LEAN_CODEX_SKILLS` 从 14 个收窄为核心 8 个：治理四件套 + `vibe-bootstrap / vibe-retrofit / vibe-discovery / vibe-exec`。
+  - **完整能力保留**：不删除 `.codex/skills/vibe-*` 源码；`--skill-set full` 仍复制完整 `.codex/.claude` 技能库。
+  - **路由降噪**：`AGENTS.md` 和 `memory-model.md` 明确默认 lean 只推荐核心 8 个，其它 Codex skill 标为 optional / advanced / source-only。
+  - **风险分级**：新增 `L0-L3` 任务风险到 profile / skill 面映射，低风险任务不因技能存在而进入完整 lifecycle。
+  - **模板防漂移**：`project-modes.md` 改为目标项目以自身 registry 的 `project_mode / harness_phase` 为准；onboarding 文档不再要求源仓物理迁移旧 skill。
+  - **经验沉淀**：扩展 L12，把“默认上下文预算化”延伸为“上下文和技能面都按需展开”，并用 `--update-refs` 回填 lesson 引用索引。
+- 原因：v5.7 已把读取上下文 profile 化，但 Codex 端仍保留较宽的默认 skill 暴露面，容易让目标项目把 optional lifecycle skill 当成日常必经流程。本次收窄默认面，同时保留 full 兼容路径。
+- 风险等级：中。影响安装器默认输出和代理路由文档；通过不删除源码、保留 `--skill-set full`、不改变治理四件套三端镜像规则来降低风险。
+- 复杂度影响评分：3/10。
+- 验证方式：`python -m py_compile scripts/install_vibe_harness.py scripts/check_memory_consistency.py scripts/context_budget.py`；安装器 discovery / retrofit / bootstrap dry-run；`python scripts/context_budget.py --profile light --json`；`python scripts/context_budget.py --profile standard --json`；`python scripts/sync_vibe_skills.py --check`；`python scripts/check_memory_consistency.py --update-refs`；`python scripts/check_memory_consistency.py --strict`；`git diff --check`；`rg` guard 确认本次新增/修改文本没有把外部项目路径写成实施目标。
+- 回滚方式：`git restore AGENTS.md README_DEPLOYMENT.md scripts/install_vibe_harness.py docs/agents/memory-model.md docs/agents/project-modes.md docs/agents/hooks-and-commands.md docs/agents/onboarding/EXISTING_VIBE_PROJECT_RETROFIT_MANUAL.md docs/agents/onboarding/LEGACY_SKILLS_MIGRATION.md docs/LESSONS.md evolution/lesson-index.json memory-bank/activeContext.md memory-bank/progress.md docs/AI_CHANGELOG.md`。
+- 关联 lessons：L1 L2 L3 L10 L11 L12。
+
 ## [2026-05-23] changelog | v5.7 默认上下文 profile 与预算门禁
 - 范围：`AGENTS.md`、`memory-bank/{memory-registry,activeContext,progress}.md`、`scripts/{context_budget,check_memory_consistency,install_vibe_harness}.py`、`scripts/hooks/codex_session_start.py`、`.github/instructions/governance.instructions.md`、`docs/agents/{memory-model,lifecycle,safety-and-completion,hooks-and-commands,project-modes}.md`、`README_DEPLOYMENT.md`、`docs/LESSONS.md`、`evolution/lesson-index.json`、`evolution/promotion-log.md`。
 - 变更：

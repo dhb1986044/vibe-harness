@@ -26,9 +26,11 @@
 扩展规则：
 
 - 需要真实命令时读 `memory-bank/tech-stack.md` 或 README/scripts/CI。
-- 触达治理路径、hook、安装器、checker、skills、memory、LESSONS、evolution 时用 `full`。
+- 触达 hook、安装器、checker、skills、memory、LESSONS、evolution 或非平凡治理路径时用 `full`；小型 docs-only 按 `L1` 处理。
 - 返工、同类失败、风险不清或破坏性操作时用 `full` 并进入 GUARD。
 - 预算检查：`python scripts/context_budget.py --profile light --json`。
+
+风险分级：`L0` typo/单文件文案用 `light` 且无需 skill；`L1` docs-only 用 `light`+命中文档，治理收尾跑 memory check；`L2` 单侧 runtime/配置/测试用 `standard` + 局部 XCHECK；`L3` contract/schema/cross-stack/high-risk 用 `full` + 完整闭环。
 
 ## 2. 项目模式
 
@@ -81,14 +83,16 @@ python scripts/check_memory_consistency.py --strict
 
 ## 6. Skill 路由
 
-只触发本仓库 `.codex/.claude/.github` 下的 `vibe-*` skill。
+只触发本仓库 `.codex/.claude/.github` 下的 `vibe-*` skill。默认 lean 和日常路由只推荐核心 8 个；其它 Codex skill 仅明确场景或 `--skill-set full` 使用。
 
-| 场景 | Skill |
+| 场景 | 默认 skill |
 |---|---|
 | 初始化/接入 | `vibe-bootstrap` / `vibe-retrofit` / `vibe-discovery` |
-| 规划/执行/调试 | `vibe-plan` / `vibe-alpha` / `vibe-exec` / `vibe-debug` |
+| 执行 | `vibe-exec` |
 | 验证/风险 | `vibe-xcheck` / `vibe-guard` |
-| 记录/经验/完成 | `vibe-changelog` / `vibe-lessons` -> `vibe-evolve` / `vibe-memory-check` |
+| 晋升/完成 | `vibe-evolve` / `vibe-memory-check` |
+
+可选高级：`vibe-plan/context/changelog/lessons/debug/review/alpha/init/knowledge/omega/pipeline/git`；源码存在不等于默认触发。
 
 治理四件套 `vibe-memory-check / vibe-guard / vibe-xcheck / vibe-evolve` 以 `.claude/skills/` 为单源，`.codex/skills/` 与 `.github/skills/` 镜像；`docs/` 子目录允许端侧分歧。同步命令：
 

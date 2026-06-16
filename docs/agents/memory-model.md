@@ -26,7 +26,16 @@ L3 不应无限堆积。高频、严重、可复用、可验证的 lessons 必�
 |---|---|---|
 | `light` | AGENTS、registry、[activeContext.md](../../memory-bank/activeContext.md) | 默认启动、简单问答、低风险定位 |
 | `standard` | light + architecture/tech-stack + progress 最新条目 + LESSONS 摘要/Pinned/最近 3 条 | 普通代码、配置、构建/测试命令、模块边界问题 |
-| `full` | v5.6 完整 bootstrap_order | 治理路径、高风险、失败复盘、LESSONS/EVOLVE/memory/schema/hook 变更 |
+| `full` | v5.6 完整 bootstrap_order | 非平凡治理路径、高风险、失败复盘、LESSONS/EVOLVE/memory/schema/hook 变更 |
+
+任务风险到 profile 的默认映射：
+
+| Level | 场景 | 默认读取 | 说明 |
+|---|---|---|---|
+| `L0` | typo、单文件文案、无行为变更 | `light` | 不触发完整 lifecycle，不默认读 LESSONS。 |
+| `L1` | docs-only / 小型治理修正 | `light` + 命中文档；治理面变更收尾跑 memory check | 只有命中治理路径或风险不清时升 `full`。 |
+| `L2` | 前端、后端、脚本或配置单侧变更 | `standard` | 读取真实命令来源并做局部 XCHECK。 |
+| `L3` | contract/schema/cross-stack/high-risk | `full` | 执行完整治理闭环和 GUARD。 |
 
 预算检查：
 
@@ -65,43 +74,39 @@ python scripts/context_budget.py --profile standard --json
 
 > 本仓库代理**只能触发** `.codex/skills/vibe-*`、`.claude/skills/vibe-*` 与 `.github/skills/vibe-*` 中的 skill。禁止使用通用 skill 名（如 spec-driven-development、planning-and-task-breakdown 等）作为触发器。
 >
-> 治理四件套（`vibe-memory-check / vibe-guard / vibe-xcheck / vibe-evolve`）三向同步；入口 skill 不进 `.github/skills/`，由 AGENTS 和 project-modes 跳转。
+> 默认 lean 安装只暴露 8 个 skill：治理四件套（`vibe-memory-check / vibe-guard / vibe-xcheck / vibe-evolve`）+ 接入/执行最小集（`vibe-bootstrap / vibe-retrofit / vibe-discovery / vibe-exec`）。其它 `.codex/skills/vibe-*` 是 optional / advanced / source-only，只有明确场景或 `--skill-set full` 才使用。
 
-按生命周期阶段：
+默认核心 skill：
 
 ```text
-INIT                 → vibe-init        → memory-bank/* 全部初始化（含 prd/architecture/tech-stack/activeContext/progress）
-PLAN                 → vibe-plan        → activeContext.md（澄清 + 范围）
-                       vibe-alpha       → activeContext.md + plans/feature-plan.md（功能演进）
-REVIEW               → vibe-review      → 仅评审 plan，不写代码
-EXEC                 → vibe-omega       → progress.md（实施后的审计 + v2 迭代；omega 不是 EXEC 本身的执行器）
-                       vibe-pipeline    → 输出 runbook
-                       vibe-debug       → bug 根因 + 最小修复
-XCHECK               → vibe-xcheck      → progress.md 追加（XCHECK 通过后）
-GUARD                → vibe-guard       → architecture.md（必要时 prd.md）
-CHANGELOG            → vibe-changelog   → docs/AI_CHANGELOG.md（结构化追加）
-LESSONS              → vibe-lessons     → docs/LESSONS.md（容量管控+归档）
-EVOLVE               → vibe-evolve      → evolution/lesson-index.json
+ONBOARDING           → vibe-bootstrap / vibe-retrofit / vibe-discovery
+EXEC                 → vibe-exec         → 最小、可回滚实施包装
+XCHECK               → vibe-xcheck       → 正向/边界/负面/回归/sanity 验证
+GUARD                → vibe-guard        → 风险、回滚、假设、残余风险
+EVOLVE               → vibe-evolve       → 评估 lesson 是否晋升能力
 COMPLETE 前          → vibe-memory-check → 校验一致性（不通过则阻断）
-辅助                 → vibe-context     → activeContext.md 「关键假设 / 未决问题」
-                       vibe-knowledge   → 知识沉淀到 architecture.md / LESSONS.md
-                       vibe-git         → 提交纪律 + plans/commit-plan.md
 ```
 
-按场景触发的最小集（**只列本仓库真实可用的 vibe-* skill**）：
+可选高级 skill（不属于 lean 默认安装面）：
+
+```text
+vibe-plan / vibe-alpha / vibe-review / vibe-debug / vibe-context / vibe-changelog
+vibe-lessons / vibe-init / vibe-knowledge / vibe-omega / vibe-pipeline / vibe-git
+```
+
+按场景触发的最小集：
 
 | 你正在做的事 | 触发 Skill | 必须更新 |
 |---|---|---|
-| 项目首次启动 / 首次写 memory-bank | **vibe-init** | memory-bank/ 全部 5 个文件 |
-| 接到新功能需求 / 大任务拆解 | **vibe-alpha** + **vibe-plan** | activeContext.md（+ plans/feature-plan.md）。决策：已有 prd.md 且为“功能演进”选 vibe-alpha；任何需“先澄清后动手”的需求选 vibe-plan |
-| 审查计划是否合理 | **vibe-review** | 仅评审，不落盘 |
+| 项目首次接入 | **vibe-bootstrap / vibe-retrofit / vibe-discovery** | registry / AGENTS draft / governance files |
+| 普通实施 | **vibe-exec** | 按任务范围最小修改 |
 | 安装/升级依赖、改 CI/scripts、构建命令变化 | EXEC（无专属 skill） | tech-stack.md（**真实命令**，禁止凭空生成 — L1） |
-| 完成一个增量 / 审计与优化 | **vibe-omega** → **vibe-xcheck** | progress.md（XCHECK 通过后）。vibe-omega = EXEC 后的审计 + v2 计划生成，不是 EXEC 执行器 |
-| 调试 bug | **vibe-debug** | progress.md（修复记录） |
+| 完成一个增量 / 审计与优化 | **vibe-xcheck** | 记录命令、场景、结果、缺口 |
+| 调试 bug | **vibe-debug**（optional） | 仅在明确调试任务中使用 |
 | 新增/重命名/删除模块、模块边界变化 | **vibe-guard** | architecture.md |
 | 产品目标/范围/非目标变化 | **vibe-guard**（破坏性范围变更） | prd.md（必要时同步 architecture.md） |
-| 完成提交、记录变更 | **vibe-changelog** + **vibe-git** | docs/AI_CHANGELOG.md（不写 memory-bank） |
-| 同一类失败第 2 次 / 累积失败 | **vibe-lessons** → **vibe-evolve** | docs/LESSONS.md（**不写 memory-bank**），评估晋升 L4 |
+| 完成提交、记录变更 | **vibe-changelog / vibe-git**（optional） | docs/AI_CHANGELOG.md（不写 memory-bank） |
+| 同一类失败第 2 次 / 累积失败 | **vibe-lessons**（optional） → **vibe-evolve** | docs/LESSONS.md（**不写 memory-bank**），评估晋升 L4 |
 | 任务收尾 | **vibe-memory-check** | 校验 memory-bank 引用一致；不通过则阻断 COMPLETE |
-| 长会话续跑 / 上下文恢复 | **vibe-context** | activeContext.md（覆写焦点 / 追加假设） |
-| 沉淀决策与约定 | **vibe-knowledge** | architecture.md（ADR）或 docs/LESSONS.md |
+| 长会话续跑 / 上下文恢复 | **vibe-context**（optional） | activeContext.md（覆写焦点 / 追加假设） |
+| 沉淀决策与约定 | **vibe-knowledge**（optional） | architecture.md（ADR）或 docs/LESSONS.md |

@@ -10,7 +10,7 @@ Modes (per docs/agents/project-modes.md):
 Hardening:
 - Detects Map-style AGENTS.md (links to docs/agents/*.md). Refuses to overwrite it
   unless --overwrite-agents is explicitly passed; writes AGENTS.v5.7.draft.md instead.
-- Defaults to a lean skill set and light context profile; pass
+- Defaults to a lean 8-skill set and light context profile; pass
   --skill-set full --context-profile full to reproduce the heavier v5.6 shape.
 - --dry-run prints intended actions without touching the filesystem.
 """
@@ -37,12 +37,6 @@ LEAN_CODEX_SKILLS = [
     "vibe-retrofit",
     "vibe-discovery",
     "vibe-exec",
-    "vibe-plan",
-    "vibe-context",
-    "vibe-changelog",
-    "vibe-lessons",
-    "vibe-debug",
-    "vibe-review",
 ]
 LEAN_CLAUDE_SKILLS = [
     "vibe-memory-check",
@@ -232,7 +226,7 @@ def main() -> int:
     ap.add_argument(
         "--overwrite-agents",
         action="store_true",
-        help="force replacing target AGENTS.md (otherwise writes AGENTS.v5.6.draft.md).",
+        help="force replacing target AGENTS.md (otherwise writes AGENTS.v5.7.draft.md).",
     )
     args = ap.parse_args()
 
@@ -275,6 +269,7 @@ def main() -> int:
         print("     harness_phase: shadow_harness   # start in shadow, then soft_gate, then managed")
         print("  3) python scripts/context_budget.py --profile light --json")
         print("  4) python scripts/check_memory_consistency.py --warn-only")
+        print("  5) Use --skill-set full only when the target project explicitly needs optional lifecycle skills.")
     else:  # bootstrap
         print("  1) Set memory-bank/memory-registry.yaml: project_mode=new_project, harness_phase=managed_harness")
         print("  2) python scripts/context_budget.py --profile light --json")

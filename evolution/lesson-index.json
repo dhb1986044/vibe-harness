@@ -1,6 +1,6 @@
 {
   "schema_version": "v5.6",
-  "updated_at": "2026-05-23",
+  "updated_at": "2026-06-16",
   "lessons": [
     {
       "id": "L1",
@@ -20,8 +20,8 @@
       "promotion_target": "guard",
       "promotion_status": "promoted",
       "source": "docs/LESSONS.md",
-      "last_referenced": "2026-05-23",
-      "reference_count": 22,
+      "last_referenced": "2026-06-16",
+      "reference_count": 23,
       "referenced_in": [
         "memory-bank/progress.md",
         "memory-bank/activeContext.md",
@@ -48,8 +48,8 @@
       "promotion_target": "skill",
       "promotion_status": "promoted:vibe-memory-check",
       "source": "docs/LESSONS.md",
-      "last_referenced": "2026-05-23",
-      "reference_count": 19,
+      "last_referenced": "2026-06-16",
+      "reference_count": 20,
       "referenced_in": [
         "memory-bank/progress.md",
         "memory-bank/activeContext.md",
@@ -76,13 +76,14 @@
       "promotion_target": "template+linter",
       "promotion_status": "promoted:v5.1-AGENTS-Map+sync_vibe_skills+L2-reference-check",
       "source": "docs/LESSONS.md",
-      "last_referenced": "2026-05-23",
-      "reference_count": 12,
+      "last_referenced": "2026-06-16",
+      "reference_count": 17,
       "referenced_in": [
         "memory-bank/progress.md",
         "memory-bank/activeContext.md",
         "docs/AI_CHANGELOG.md",
-        "evolution/promotion-log.md"
+        "evolution/promotion-log.md",
+        "plans/commit-plan.md"
       ],
       "promotion_score": 0
     },
@@ -270,8 +271,8 @@
       "promotion_target": "template+linter",
       "promotion_status": "promoted:project-mode+phase-aware-hooks",
       "source": "docs/LESSONS.md",
-      "last_referenced": "2026-05-23",
-      "reference_count": 12,
+      "last_referenced": "2026-06-16",
+      "reference_count": 13,
       "referenced_in": [
         "memory-bank/progress.md",
         "memory-bank/activeContext.md",
@@ -295,8 +296,8 @@
       "maturity": "verified",
       "promotion_target": "skill",
       "promotion_status": "candidate",
-      "last_referenced": "2026-05-23",
-      "reference_count": 11,
+      "last_referenced": "2026-06-16",
+      "reference_count": 12,
       "referenced_in": [
         "memory-bank/progress.md",
         "memory-bank/activeContext.md",
@@ -320,8 +321,8 @@
       "maturity": "verified",
       "promotion_target": "lesson",
       "promotion_status": "keep_as_lesson",
-      "last_referenced": "2026-05-23",
-      "reference_count": 7,
+      "last_referenced": "2026-06-16",
+      "reference_count": 10,
       "referenced_in": [
         "memory-bank/progress.md",
         "memory-bank/activeContext.md",

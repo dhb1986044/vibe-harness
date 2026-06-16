@@ -63,7 +63,7 @@ Copilot **不具备 shell hook 通道**（无 SessionStart / UserPromptSubmit / 
 
 镜像策略：Copilot 优先读 `.github/skills/vibe-*`，与 `.codex/skills/vibe-*`、`.claude/skills/vibe-*` 通过 `python scripts/sync_vibe_skills.py --write` 保持字节级一致（仅治理四件套契约，`docs/` 子目录允许三端分歧）。
 
-安装器在所有模式下都应保留现有 `.github/copilot-instructions.md`，但必须补齐缺失的 `.github/instructions/governance.instructions.md`；`scripts/check_memory_consistency.py --strict` 会检查该文件及其 `applyTo` 覆盖面。v5.7 默认安装 `--context-profile light --skill-set lean`，需要旧重治理形态时显式传 `--context-profile full --skill-set full`。
+安装器在所有模式下都应保留现有 `.github/copilot-instructions.md`，但必须补齐缺失的 `.github/instructions/governance.instructions.md`；`scripts/check_memory_consistency.py --strict` 会检查该文件及其 `applyTo` 覆盖面。v5.7 默认安装 `--context-profile light --skill-set lean`，其中 `lean` 只安装核心 8 个 vibe skill；需要完整 Codex 技能库或旧重治理形态时显式传 `--context-profile full --skill-set full`。
 
 ## Context Budget
 

@@ -24,7 +24,7 @@ templates/
 
 ## 2. 安装到已有项目
 
-推荐用安装器，默认轻量上下文与 lean skill set：
+推荐用安装器，默认轻量上下文与 lean skill set。`lean` 只安装核心 8 个 vibe skill：治理四件套 + `vibe-bootstrap / vibe-retrofit / vibe-discovery / vibe-exec`。
 
 ```bash
 python scripts/install_vibe_harness.py --target <project-root> --mode retrofit --context-profile light --skill-set lean
@@ -32,7 +32,7 @@ python scripts/context_budget.py --profile light --json
 python scripts/check_memory_consistency.py --strict
 ```
 
-如需复现 v5.6 重治理形态，显式传 `--context-profile full --skill-set full`。
+如需复制完整 Codex 技能库或复现 v5.6 重治理形态，显式传 `--context-profile full --skill-set full`。
 
 ## 3. Codex 配置
 

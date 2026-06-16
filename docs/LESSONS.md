@@ -123,6 +123,6 @@
 - 成熟度：verified
 - 场景：v5.6 的默认 MEMORY_BOOTSTRAP 会读取 AGENTS、registry、progress、architecture、tech-stack、LESSONS、lesson-index 等约 50KB 内容；普通任务还会额外触发 skill 正文和工具输出，导致 token 成本长期偏高。
 - 风险：（1）每轮会话为低风险任务支付 full governance 成本；（2）重要规则被大量历史上下文稀释；（3）业务项目接入 harness 后对 token 成本敏感，容易绕开治理。
-- 修复策略：把 `read_policy` 改为 `light / standard / full` 三档；默认 `light` 只读契约、registry 与当前焦点；普通任务按需升到 `standard`；治理路径、高风险、失败复盘和 LESSONS/EVOLVE/memory 变更才升到 `full`；用 `scripts/context_budget.py` 和 checker 守住预算。
-- 可复用模式：上下文不是越多越安全；稳定契约进 AGENTS，真实事实进 profile，历史经验只按风险展开，并用预算工具量化。
+- 修复策略：把 `read_policy` 改为 `light / standard / full` 三档；默认 `light` 只读契约、registry 与当前焦点；普通任务按需升到 `standard`；治理路径、高风险、失败复盘和 LESSONS/EVOLVE/memory 变更才升到 `full`；默认 `lean` skill 面只暴露核心 8 个，完整 Codex 技能库必须显式 `--skill-set full`；用 `scripts/context_budget.py` 和 checker 守住预算。
+- 可复用模式：上下文和技能面都不是越多越安全；稳定契约进 AGENTS，真实事实进 profile，历史经验和高级 skill 只按风险/明确场景展开，并用预算工具量化。
 - 建议升级为 Guard/XCheck/Skill 规则：已固化为 `read_policy.profiles`、`scripts/context_budget.py` 与 `check_memory_consistency` 的 profile/budget lint；无需新增 skill。

@@ -77,4 +77,4 @@ INIT → MEMORY_BOOTSTRAP → PLAN → ALPHA → REVIEW → EXEC → XCHECK → 
 
 ## 6. 与 v5.5 治理面的关系
 
-v5.6 在 v5.5（Map + 三向同步 + lesson schema + reference tracking + log prefix lint）之上**新增**项目模式与 phase 切档能力，不替换任何 v5.5 既有机制。本仓库自身保持 `vibe_managed_legacy` + `managed_harness`，行为与 v5.5 完全一致。
+v5.6 在 v5.5（Map + 三向同步 + lesson schema + reference tracking + log prefix lint）之上**新增**项目模式与 phase 切档能力，不替换任何 v5.5 既有机制。具体项目的 `project_mode` / `harness_phase` 只以该项目的 `memory-bank/memory-registry.yaml` 为准；AGENTS 和本文档只提供路由与判定规则。
