@@ -5,10 +5,10 @@
 ## 初始化骨架（按时间倒序，最新的在最上面）
 
 ## [2026-06-16] progress | lean skill 瘦身提交发布
-- 已完成：根据用户当前指令准备提交并推送默认 lean skill 面收窄变更；生成 `plans/commit-plan.md`，提交范围限定在 `D:/workspace/vibe-harness-v5`，不触达外部项目。
-- 进行中：执行提交前门禁、stage、commit、push。
+- 已完成：根据用户当前指令提交并推送默认 lean skill 面收窄变更；实现提交为 `b57fdb5 chore: slim default vibe skill surface`，范围限定在 `D:/workspace/vibe-harness-v5`，不触达外部项目。
+- 进行中：无。
 - 阻塞 / 风险：无当前阻塞。风险等级：中；发布后如需回退，优先追加 revert/fix commit，不做强推。
-- 下一步：完成 `git commit` 与 `git push`，最终 commit hash 以 Git 历史和交付回复为准。
+- 下一步：无。最终远端状态以 Git 历史和交付回复为准。
 
 ## [2026-06-16] progress | 默认 lean skill 面收窄
 - 已完成：将 `scripts/install_vibe_harness.py` 的 Codex lean 默认技能集从 14 个收窄为核心 8 个：`vibe-memory-check`、`vibe-evolve`、`vibe-guard`、`vibe-xcheck`、`vibe-bootstrap`、`vibe-retrofit`、`vibe-discovery`、`vibe-exec`；保留完整 `.codex/skills/vibe-*` 源码，`--skill-set full` 仍复制完整技能库。同步更新 `AGENTS.md`、`docs/agents/{memory-model,project-modes,hooks-and-commands,onboarding/*}.md`、`README_DEPLOYMENT.md` 与 L12，补入 `L0-L3` 风险分级、默认核心 skill 路由和 optional / advanced / source-only 说明。
